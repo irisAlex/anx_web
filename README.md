@@ -25,6 +25,12 @@ npm run test
 npm run lint
 ```
 
+### use  ant desing 
+
+npm i --save ant-design-vue@next  
+
+
+
 
 整理代码结构
 ``` lua

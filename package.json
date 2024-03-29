@@ -17,6 +17,7 @@
         "@vueuse/core": "^10.7.2",
         "@wangeditor/editor": "^5.1.23",
         "@wangeditor/editor-for-vue": "^5.1.12",
+        "ant-design-vue": "^4.0.0-rc.6",
         "axios": "^1.4.0",
         "core-js": "^3.31.1",
         "echarts": "5.4.3",
