@@ -13,3 +13,6 @@ COPY --from=0 /gva_web/dist /usr/share/nginx/html
 RUN cat /etc/nginx/nginx.conf
 RUN cat /etc/nginx/conf.d/my.conf
 RUN ls -al /usr/share/nginx/html
+
+
+docker run -d --name postgres-container -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -p 5432:5432 -v /var/lib/postgresql/data:/var/lib/postgresql/data postgres
