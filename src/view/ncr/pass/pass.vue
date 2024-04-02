@@ -55,7 +55,7 @@
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="document" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
+                        <el-button icon="view" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
                         <el-button icon="check" type="primary" link @click="deleteApiFunc(scope.row)">同意</el-button>
                         <el-button icon="remove" type="primary" link @click="editApiFunc(scope.row)">拒绝</el-button>
                         <el-button icon="circle-close" type="primary" link
