@@ -29,22 +29,13 @@
                 <el-form-item label="供应商名称">
                     <el-input v-model="searchInfo.apiGroup" placeholder="项目名称" />
                 </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
+                    <el-button icon="refresh" @click="onReset">重置</el-button>
+                </el-form-item>
             </el-form>
         </div>
         <div class="gva-table-box">
-            <div class="gva-btn-list">
-                <el-button type="primary" icon="plus" @click="openDialog('addApi')">新增</el-button>
-                <el-popover v-model="freshVisible" placement="top" width="160">
-                    <p>确定要刷新Casbin缓存吗？</p>
-                    <div style="text-align: right; margin-top: 8px;">
-                        <el-button type="primary" link @click="freshVisible = false">取消</el-button>
-                        <el-button type="primary" @click="onFresh">确定</el-button>
-                    </div>
-                    <template #reference>
-                        <el-button icon="Refresh" @click="freshVisible = true">刷新缓存</el-button>
-                    </template>
-                </el-popover>
-            </div>
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
                 <el-table-column align="left" label="编号" min-width="150" prop="path" sortable="custom" />
@@ -65,8 +56,8 @@
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
                         <el-button icon="document" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
-                        <el-button icon="edit" type="primary" link @click="deleteApiFunc(scope.row)">同意</el-button>
-                        <el-button icon="delete" type="primary" link @click="editApiFunc(scope.row)">拒绝</el-button>
+                        <el-button icon="check" type="primary" link @click="deleteApiFunc(scope.row)">同意</el-button>
+                        <el-button icon="remove" type="primary" link @click="editApiFunc(scope.row)">拒绝</el-button>
                         <el-button icon="circle-close" type="primary" link
                             @click="editApiFunc(scope.row)">关闭</el-button>
                     </template>

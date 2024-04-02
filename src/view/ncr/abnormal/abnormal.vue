@@ -26,16 +26,7 @@
                 <el-form-item label="受检物号">
                     <el-input v-model="searchInfo.apiGroup" placeholder="受检物号" />
                 </el-form-item>
-                <el-form-item label="处理方式">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="项目名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="项目名称" />
-                </el-form-item>
-                <el-form-item label="填表日期">
+                <el-form-item label="创建日期">
                     <el-date-picker v-model="value" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
                         :default-time="['00:00:00', '23:59:59']">
                     </el-date-picker>
@@ -69,27 +60,20 @@
                 <el-table-column align="left" label="项目" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="受检物名称" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="受检物号" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="处理方式" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="责任部门" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="检验日期" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="填表日期" min-width="150" prop="description" sortable="custom">
+                <el-table-column align="left" label="描述" min-width="150" prop="description" sortable="custom" />
+                <el-table-column align="left" label="标签识别" min-width="150" prop="description" sortable="custom" />
+                <el-table-column align="left" label="创建时间" min-width="150" prop="description" sortable="custom" >
                     <template #default="scope">
                         <div>
                             {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
                         </div>
                     </template>
                 </el-table-column>
-
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="document" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
                         <el-button icon="edit" type="primary" link @click="deleteApiFunc(scope.row)">修改</el-button>
                         <el-button icon="delete" type="primary" link @click="editApiFunc(scope.row)">删除</el-button>
-                        <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row)">返工</el-button>
-                        <el-button icon="setting" type="primary" link @click="editApiFunc(scope.row)">返修</el-button>
-                        <el-button icon="finished" type="primary" link @click="editApiFunc(scope.row)">让步接收</el-button>
-                        <el-button icon="circle-close" type="primary" link
-                            @click="editApiFunc(scope.row)">关闭</el-button>
+                        <el-button icon="finished" type="primary" link @click="editApiFunc(scope.row)">创建NCR</el-button>
                     </template>
                 </el-table-column>
             </el-table>
