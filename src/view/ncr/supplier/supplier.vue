@@ -59,14 +59,14 @@
 
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="30%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="所属国家" prop="path" style="width:100%">
-                    <el-input placeholder="所属国家"/>
+                <el-form-item label="所属国家" prop="country" style="width:100%">
+                    <el-input placeholder="所属国家" autocomplete="off" v-model="form.country"/>
                 </el-form-item>
-                <el-form-item label="供应商类型" prop="path" style="width:100%">
-                    <el-input placeholder="供应商类型"/>
+                <el-form-item label="供应商类型" prop="genre" style="width:100%">
+                    <el-input placeholder="供应商类型" autocomplete="off" v-model="form.genre"/>
                 </el-form-item>
-                <el-form-item label="供应商名称" prop="path" style="width:100%">
-                    <el-input placeholder="供应商名称" />
+                <el-form-item label="供应商名称" prop="name" style="width:100%">
+                    <el-input placeholder="供应商名称" autocomplete="off" v-model="form.name"/>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -107,10 +107,9 @@ const methodFilter = (value) => {
 
 const apis = ref([])
 const form = ref({
-    path: '',
-    apiGroup: '',
-    method: '',
-    description: ''
+    country: '',
+    genre: '',
+    name: ''
 })
 const methodOptions = ref([
     {
@@ -137,15 +136,12 @@ const methodOptions = ref([
 
 const type = ref('')
 const rules = ref({
-    path: [{ required: true, message: '请输入api路径', trigger: 'blur' }],
-    apiGroup: [
-        { required: true, message: '请输入组名称', trigger: 'blur' }
+    country: [{ required: true, message: '请输入国家', trigger: 'blur' }],
+    genre: [
+        { required: true, message: '请输入类别', trigger: 'blur' }
     ],
-    method: [
-        { required: true, message: '请选择请求方式', trigger: 'blur' }
-    ],
-    description: [
-        { required: true, message: '请输入api介绍', trigger: 'blur' }
+    name: [
+        { required: true, message: '请输入名称', trigger: 'blur' }
     ]
 })
 
@@ -240,10 +236,9 @@ const apiForm = ref(null)
 const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
-        path: '',
-        apiGroup: '',
-        method: '',
-        description: ''
+        country: '',
+        genre: '',
+        name: ''
     }
 }
 
@@ -255,7 +250,7 @@ const openDialog = (key) => {
             dialogTitle.value = '添加供应商'
             break
         case 'edit':
-            dialogTitle.value = '编辑Api'
+            dialogTitle.value = '编辑供应商'
             break
         default:
             break
@@ -280,6 +275,7 @@ const enterDialog = async () => {
             switch (type.value) {
                 case 'addApi':
                     {
+                        console.log(form.value)
                         const res = await createApi(form.value)
                         if (res.code === 0) {
                             ElMessage({
