@@ -51,7 +51,7 @@
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
                 <el-table-column align="left" label="产品名称" min-width="150" prop="path" sortable="custom" />
-                <el-table-column align="left" label="产品序列号（物料编码）" min-width="150" prop="apiGroup" sortable="custom" />
+                <el-table-column align="left" label="产品序列号（物料编码）" min-width="230" prop="apiGroup" sortable="custom" />
                 <el-table-column align="left" label="客户名称" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="投诉人" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="项目" min-width="150" prop="description" sortable="custom" />
@@ -59,17 +59,17 @@
                 <el-table-column align="left" label="受检物号" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="内部反馈人" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="内部反馈单位" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="问题描述（5W2H）附件照片" min-width="150" prop="description"
+                <el-table-column align="left" label="问题描述（5W2H）附件照片" min-width="250" prop="description"
                     sortable="custom" />
                 <el-table-column align="left" label="问题分级" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="短期措施/计划完成时间" min-width="150" prop="description"
+                <el-table-column align="left" label="短期措施/计划完成时间" min-width="250" prop="description"
                     sortable="custom" />
-                <el-table-column align="left" label="原因分析/附件/描述" min-width="150" prop="description" sortable="custom" />
+                <el-table-column align="left" label="原因分析/附件/描述" min-width="230" prop="description" sortable="custom" />
                 <el-table-column align="left" label="整改措施" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="客服订单" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="负责人" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="成本" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="整改计划完成时间" min-width="150" prop="description" sortable="custom" />
+                <el-table-column align="left" label="整改计划完成时间" min-width="200" prop="description" sortable="custom" />
                 <el-table-column align="left" label="提交时间" min-width="150" prop="description" sortable="custom" />
                 <el-table-column align="left" label="关闭时间" min-width="150" prop="description" sortable="custom">
 

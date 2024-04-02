@@ -68,33 +68,33 @@
 
         </div>
 
-        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="70%">
+        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="30%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="项目名称" prop="path" style="width:25%">
-                    <el-input placeholder="受检物名称" size="mini" />
+                <el-form-item label="项目名称" prop="path" style="width:100%">
+                    <el-input placeholder="项目名称" size="mini" />
                 </el-form-item>
-                <el-form-item label="部门" prop="method" style="width:20%">
+                <el-form-item label="部门" prop="method" style="width:100%">
                     <el-select v-model="form.method" placeholder="北京安新" style="width:100%">
                         <el-option v-for="item in methodOptions" :key="item.value"
                             :label="`${item.label}(${item.value})`" :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="负责人" prop="method" style="width:30%">
+                <el-form-item label="负责人" prop="method" style="width:100%">
                     <el-input placeholder="负责人" size="mini" />
                 </el-form-item>
-                <el-form-item label="项目周期" prop="path" style="width:30%">
+                <el-form-item label="项目周期" prop="path" style="width:100%">
                     <el-select v-model="form.method" placeholder="供应商" style="width:100%">
                         <el-option v-for="item in methodOptions" :key="item.value"
                             :label="`${item.label}(${item.value})`" :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="优先级" prop="path" style="width:30%">
+                <el-form-item label="优先级" prop="path" style="width:100%">
                     <el-select v-model="form.method" placeholder="供应商" style="width:100%">
                         <el-option v-for="item in methodOptions" :key="item.value"
                             :label="`${item.label}(${item.value})`" :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="不合格描述" prop="method" style="width:80%">
+                <el-form-item label="项目描述" prop="method" style="width:100%">
                     <el-input type="textarea" placeholder="请输入内容" v-model="textarea" maxlength="50" show-word-limit
                         :rows="10" />
                 </el-form-item>
