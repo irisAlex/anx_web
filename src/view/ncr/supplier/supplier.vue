@@ -60,13 +60,13 @@
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="30%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
                 <el-form-item label="所属国家" prop="country" style="width:100%">
-                    <el-input placeholder="所属国家" autocomplete="off" v-model="form.country"/>
+                    <el-input placeholder="所属国家" autocomplete="off" v-model="form.country" />
                 </el-form-item>
                 <el-form-item label="供应商类型" prop="genre" style="width:100%">
-                    <el-input placeholder="供应商类型" autocomplete="off" v-model="form.genre"/>
+                    <el-input placeholder="供应商类型" autocomplete="off" v-model="form.genre" />
                 </el-form-item>
                 <el-form-item label="供应商名称" prop="name" style="width:100%">
-                    <el-input placeholder="供应商名称" autocomplete="off" v-model="form.name"/>
+                    <el-input placeholder="供应商名称" autocomplete="off" v-model="form.name" />
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -81,14 +81,8 @@
 
 <script setup>
 import {
-    getApiById,
-    getApiList,
-    createApi,
-    updateApi,
-    deleteApi,
-    deleteApisByIds,
-    freshCasbin
-} from '@/api/api'
+    createSupplierApi
+} from '@/api/supplier'
 import { toSQLLine } from '@/utils/stringFun'
 import WarningBar from '@/components/warningBar/warningBar.vue'
 import { ref } from 'vue'
@@ -276,7 +270,7 @@ const enterDialog = async () => {
                 case 'addApi':
                     {
                         console.log(form.value)
-                        const res = await createApi(form.value)
+                        const res = await createSupplierApi(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -284,7 +278,7 @@ const enterDialog = async () => {
                                 showClose: true
                             })
                         }
-                        getTableData()
+                        // getTableData()
                         closeDialog()
                     }
 
