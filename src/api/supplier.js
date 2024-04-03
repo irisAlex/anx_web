@@ -12,9 +12,9 @@ import service from "@/utils/request";
 //  page     int
 //	pageSize int
 // }
-export const getApiList = (data) => {
+export const getSupplierList = (data) => {
   return service({
-    url: "/api/getApiList",
+    url: "/supplier/getAllSupplierList",
     method: "post",
     data,
   });
@@ -44,9 +44,9 @@ export const createSupplierApi = (data) => {
 // @Param data body api.GetById true "根据id获取菜单"
 // @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /menu/getApiById [post]
-export const getApiById = (data) => {
+export const getSupplierById = (data) => {
   return service({
-    url: "/api/getApiById",
+    url: "/supplier/getSupplierById",
     method: "post",
     data,
   });
@@ -60,9 +60,9 @@ export const getApiById = (data) => {
 // @Param data body api.CreateApiParams true "更新api"
 // @Success 200 {string} json "{"success":true,"data":{},"msg":"更新成功"}"
 // @Router /api/updateApi [post]
-export const updateApi = (data) => {
+export const updateSupplier = (data) => {
   return service({
-    url: "/api/updateApi",
+    url: "/supplier/updateSupplier",
     method: "post",
     data,
   });
@@ -107,9 +107,9 @@ export const getAllApis = (data) => {
 // @Param data body dbModel.Api true "删除api"
 // @Success 200 {string} json "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /api/deleteApi [post]
-export const deleteApi = (data) => {
+export const deleteSupplier = (data) => {
   return service({
-    url: "/api/deleteApi",
+    url: "/supplier/deleteSupplier",
     method: "post",
     data,
   });

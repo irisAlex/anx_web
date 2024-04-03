@@ -3,13 +3,13 @@
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
                 <el-form-item label="所属国家">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="所属国家" />
+                    <el-input v-model="searchInfo.country" placeholder="所属国家" />
                 </el-form-item>
                 <el-form-item label="供应商类型">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="供应商类型" />
+                    <el-input v-model="searchInfo.genre" placeholder="供应商类型" />
                 </el-form-item>
                 <el-form-item label="供应商名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="供应商类型" />
+                    <el-input v-model="searchInfo.name" placeholder="供应商类型" />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
@@ -20,32 +20,17 @@
         <div class="gva-table-box">
             <div class="gva-btn-list">
                 <el-button type="primary" icon="plus" @click="openDialog('addApi')">新增</el-button>
-                <el-popover v-model="freshVisible" placement="top" width="160">
-                    <p>确定要刷新Casbin缓存吗？</p>
-                    <div style="text-align: right; margin-top: 8px;">
-                        <el-button type="primary" link @click="freshVisible = false">取消</el-button>
-                        <el-button type="primary" @click="onFresh">确定</el-button>
-                    </div>
-                    <template #reference>
-                        <el-button icon="Refresh" @click="freshVisible = true">刷新缓存</el-button>
-                    </template>
-                </el-popover>
             </div>
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
-                <el-table-column align="left" label="所属国家" min-width="150" prop="path" sortable="custom" />
-                <el-table-column align="left" label="供应商类型" min-width="150" prop="apiGroup" sortable="custom" />
-                <el-table-column align="left" label="供应商名称" min-width="150" prop="description" sortable="custom">
-                    <template #default="scope">
-                        <div>
-                            {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
-                        </div>
-                    </template>
+                <el-table-column align="left" label="所属国家" min-width="150" prop="country" sortable="custom" />
+                <el-table-column align="left" label="供应商类型" min-width="150" prop="genre" sortable="custom" />
+                <el-table-column align="left" label="供应商名称" min-width="150" prop="name" sortable="custom">
                 </el-table-column>
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="edit" type="primary" link @click="deleteApiFunc(scope.row)">修改</el-button>
-                        <el-button icon="delete" type="primary" link @click="editApiFunc(scope.row)">删除</el-button>
+                        <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row)">修改</el-button>
+                        <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -81,7 +66,12 @@
 
 <script setup>
 import {
-    createSupplierApi
+    createSupplierApi,
+    getSupplierList,
+    getSupplierById,
+    deleteSupplier,
+    updateSupplier
+
 } from '@/api/supplier'
 import { toSQLLine } from '@/utils/stringFun'
 import WarningBar from '@/components/warningBar/warningBar.vue'
@@ -181,7 +171,7 @@ const sortChange = ({ prop, order }) => {
 
 // 查询
 const getTableData = async () => {
-    const table = await getApiList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getSupplierList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -258,8 +248,8 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-    const res = await getApiById({ id: row.ID })
-    form.value = res.data.api
+    const res = await getSupplierById({ id: row.ID })
+    form.value = res.data.supplier
     openDialog('edit')
 }
 
@@ -278,14 +268,14 @@ const enterDialog = async () => {
                                 showClose: true
                             })
                         }
-                        // getTableData()
+                        getTableData()
                         closeDialog()
                     }
 
                     break
                 case 'edit':
                     {
-                        const res = await updateApi(form.value)
+                        const res = await updateSupplier(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -313,13 +303,13 @@ const enterDialog = async () => {
 }
 
 const deleteApiFunc = async (row) => {
-    ElMessageBox.confirm('此操作将永久删除所有角色下该api, 是否继续?', '提示', {
+    ElMessageBox.confirm('此操作将永久删除数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
     })
         .then(async () => {
-            const res = await deleteApi(row)
+            const res = await deleteSupplier(row)
             if (res.code === 0) {
                 ElMessage({
                     type: 'success',
