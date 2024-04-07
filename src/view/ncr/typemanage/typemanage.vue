@@ -3,10 +3,10 @@
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
                 <el-form-item label="物料类别">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="物料类别" />
+                    <el-input v-model="searchInfo.genre" placeholder="物料类别" />
                 </el-form-item>
                 <el-form-item label="物料类别名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="供应商类型" />
+                    <el-input v-model="searchInfo.name" placeholder="供应商类型" />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
@@ -17,31 +17,16 @@
         <div class="gva-table-box">
             <div class="gva-btn-list">
                 <el-button type="primary" icon="plus" @click="openDialog('addApi')">新增</el-button>
-                <el-popover v-model="freshVisible" placement="top" width="160">
-                    <p>确定要刷新Casbin缓存吗？</p>
-                    <div style="text-align: right; margin-top: 8px;">
-                        <el-button type="primary" link @click="freshVisible = false">取消</el-button>
-                        <el-button type="primary" @click="onFresh">确定</el-button>
-                    </div>
-                    <template #reference>
-                        <el-button icon="Refresh" @click="freshVisible = true">刷新缓存</el-button>
-                    </template>
-                </el-popover>
             </div>
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
-                <el-table-column align="left" label="物料类别" min-width="150" prop="path" sortable="custom" />
-                <el-table-column align="left" label="物料类别名称" min-width="150" prop="description" sortable="custom">
-                    <template #default="scope">
-                        <div>
-                            {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
-                        </div>
-                    </template>
+                <el-table-column align="left" label="物料类别" min-width="150" prop="genre" sortable="custom" />
+                <el-table-column align="left" label="物料类别名称" min-width="150" prop="name" sortable="custom">
                 </el-table-column>
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="edit" type="primary" link @click="deleteApiFunc(scope.row)">修改</el-button>
-                        <el-button icon="delete" type="primary" link @click="editApiFunc(scope.row)">删除</el-button>
+                        <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row)">修改</el-button>
+                        <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -55,11 +40,11 @@
 
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="30%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="物料类别" prop="path" style="width:100%">
-                    <el-input placeholder="物料类别" size="mini" />
+                <el-form-item label="物料类别" prop="genre" style="width:100%">
+                    <el-input placeholder="物料类别" size="mini" v-model="form.genre" />
                 </el-form-item>
-                <el-form-item label="物料类别名称" prop="path" style="width:100%">
-                    <el-input placeholder="物料类别名称" size="mini" />
+                <el-form-item label="物料类别名称" prop="name" style="width:100%">
+                    <el-input placeholder="物料类别名称" size="mini" v-model="form.name" />
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -74,14 +59,12 @@
 
 <script setup>
 import {
-    getApiById,
-    getApiList,
-    createApi,
-    updateApi,
-    deleteApi,
-    deleteApisByIds,
-    freshCasbin
-} from '@/api/api'
+    getTypeById,
+    getTypeList,
+    createType,
+    updateType,
+    deleteType
+} from '@/api/type'
 import { toSQLLine } from '@/utils/stringFun'
 import WarningBar from '@/components/warningBar/warningBar.vue'
 import { ref } from 'vue'
@@ -100,10 +83,8 @@ const methodFilter = (value) => {
 
 const apis = ref([])
 const form = ref({
-    path: '',
-    apiGroup: '',
-    method: '',
-    description: ''
+    genre: '',
+    name: ''
 })
 const methodOptions = ref([
     {
@@ -130,15 +111,9 @@ const methodOptions = ref([
 
 const type = ref('')
 const rules = ref({
-    path: [{ required: true, message: '请输入api路径', trigger: 'blur' }],
-    apiGroup: [
-        { required: true, message: '请输入组名称', trigger: 'blur' }
-    ],
-    method: [
-        { required: true, message: '请选择请求方式', trigger: 'blur' }
-    ],
-    description: [
-        { required: true, message: '请输入api介绍', trigger: 'blur' }
+    genre: [{ required: true, message: '请输入类别', trigger: 'blur' }],
+    name: [
+        { required: true, message: '请输入名称', trigger: 'blur' }
     ]
 })
 
@@ -184,7 +159,7 @@ const sortChange = ({ prop, order }) => {
 
 // 查询
 const getTableData = async () => {
-    const table = await getApiList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getTypeList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -203,7 +178,7 @@ const handleSelectionChange = (val) => {
 const deleteVisible = ref(false)
 const onDelete = async () => {
     const ids = apis.value.map(item => item.ID)
-    const res = await deleteApisByIds({ ids })
+    const res = await deleteTypeByIds({ ids })
     if (res.code === 0) {
         ElMessage({
             type: 'success',
@@ -233,22 +208,20 @@ const apiForm = ref(null)
 const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
-        path: '',
-        apiGroup: '',
-        method: '',
-        description: ''
+        genre: '',
+        name: ''
     }
 }
 
-const dialogTitle = ref('添加不合格品')
+const dialogTitle = ref('添加类别')
 const dialogFormVisible = ref(false)
 const openDialog = (key) => {
     switch (key) {
         case 'addApi':
-            dialogTitle.value = '添加不合格品'
+            dialogTitle.value = '添加类别'
             break
         case 'edit':
-            dialogTitle.value = '编辑Api'
+            dialogTitle.value = '编辑类别'
             break
         default:
             break
@@ -262,8 +235,8 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-    const res = await getApiById({ id: row.ID })
-    form.value = res.data.api
+    const res = await getTypeById({ id: row.ID })
+    form.value = res.data.typem
     openDialog('edit')
 }
 
@@ -273,7 +246,7 @@ const enterDialog = async () => {
             switch (type.value) {
                 case 'addApi':
                     {
-                        const res = await createApi(form.value)
+                        const res = await createType(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -288,7 +261,7 @@ const enterDialog = async () => {
                     break
                 case 'edit':
                     {
-                        const res = await updateApi(form.value)
+                        const res = await updateType(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -316,13 +289,13 @@ const enterDialog = async () => {
 }
 
 const deleteApiFunc = async (row) => {
-    ElMessageBox.confirm('此操作将永久删除所有角色下该api, 是否继续?', '提示', {
+    ElMessageBox.confirm('此操作将永久删除数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
     })
         .then(async () => {
-            const res = await deleteApi(row)
+            const res = await deleteType(row)
             if (res.code === 0) {
                 ElMessage({
                     type: 'success',

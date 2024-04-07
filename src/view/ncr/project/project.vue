@@ -3,17 +3,17 @@
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
                 <el-form-item label="项目名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="项目名称" />
+                    <el-input v-model="searchInfo.name" placeholder="项目名称" />
                 </el-form-item>
                 <el-form-item label="项目周期">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="项目周期" />
+                    <el-input v-model.number="searchInfo.period" placeholder="项目周期" />
                 </el-form-item>
                 <el-form-item label="负责人">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="项目名称" />
+                    <el-input v-model="searchInfo.principal" placeholder="项目名称" />
                 </el-form-item>
                 <el-form-item label="项目开始日期">
-                    <el-date-picker v-model="value" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-                        :default-time="['00:00:00', '23:59:59']">
+                    <el-date-picker v-model="searchInfo.created_at" type="date" placeholder="选择日期"
+                        value-format="YYYY-MM-DDT15:04:05Z">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
@@ -38,25 +38,17 @@
             </div>
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
-                <el-table-column align="left" label="编号" min-width="150" prop="path" sortable="custom" />
-                <el-table-column align="left" label="项目名称" min-width="150" prop="apiGroup" sortable="custom" />
-                <el-table-column align="left" label="描述" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="负责人" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="项目周期" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="优先级" min-width="150" prop="description" sortable="custom" >
-                <template #default="scope">
-                    <div>
-                        {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
-                    </div>
-                </template>
+                <el-table-column align="left" label="项目名称" min-width="150" prop="name" sortable="custom" />
+                <el-table-column align="left" label="描述" min-width="150" prop="describe" sortable="custom" />
+                <el-table-column align="left" label="负责人" min-width="150" prop="principal" sortable="custom" />
+                <el-table-column align="left" label="项目周期" min-width="150" prop="period" sortable="custom" />
+                <el-table-column align="left" label="优先级" min-width="150" prop="priority" sortable="custom">
                 </el-table-column>
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="edit" type="primary" link @click="deleteApiFunc(scope.row)">修改</el-button>
-                        <el-button icon="delete" type="primary" link @click="editApiFunc(scope.row)">删除</el-button>
-                        <el-button icon="circle-close" type="primary" link
-                            @click="editApiFunc(scope.row)">关闭</el-button>
+                        <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row)">修改</el-button>
+                        <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -68,34 +60,25 @@
 
         </div>
 
-        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="30%">
+        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="40%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="项目名称" prop="path" style="width:100%">
-                    <el-input placeholder="项目名称" size="mini" />
+                <el-form-item label="项目名称" prop="name" style="width:100%">
+                    <el-input placeholder="项目名称" size="mini" v-model="form.name" />
                 </el-form-item>
-                <el-form-item label="部门" prop="method" style="width:100%">
-                    <el-select v-model="form.method" placeholder="北京安新" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
+                <el-form-item label="负责人" prop="principal" style="width:100%">
+                    <el-input placeholder="负责人" size="mini" v-model="form.principal" />
+                </el-form-item>
+                <el-form-item label="项目周期/天" prop="period" style="width:100%">
+                    <el-slider v-model="form.period"></el-slider>
+                </el-form-item>
+                <el-form-item label="优先级" prop="priority" style="width:100%">
+                    <el-select v-model="form.priority" placeholder="优先级" style="width:100%">
+                        <el-option v-for="item in methodOptions" :key="item.value" :label="`${item.label}`"
+                            :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="负责人" prop="method" style="width:100%">
-                    <el-input placeholder="负责人" size="mini" />
-                </el-form-item>
-                <el-form-item label="项目周期" prop="path" style="width:100%">
-                    <el-select v-model="form.method" placeholder="供应商" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="优先级" prop="path" style="width:100%">
-                    <el-select v-model="form.method" placeholder="供应商" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="项目描述" prop="method" style="width:100%">
-                    <el-input type="textarea" placeholder="请输入内容" v-model="textarea" maxlength="50" show-word-limit
+                <el-form-item label="项目描述" prop="describe" style="width:100%">
+                    <el-input type="textarea" placeholder="请输入内容" v-model="form.describe" maxlength="50" show-word-limit
                         :rows="10" />
                 </el-form-item>
             </el-form>
@@ -111,20 +94,25 @@
 
 <script setup>
 import {
-    getApiById,
-    getApiList,
-    createApi,
-    updateApi,
-    deleteApi,
-    deleteApisByIds,
-    freshCasbin
-} from '@/api/api'
+    getProjectList,
+    createProject,
+    getProjectById,
+    updateProject,
+    deleteProject
+} from '@/api/project'
 import { toSQLLine } from '@/utils/stringFun'
 import WarningBar from '@/components/warningBar/warningBar.vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { VideoCameraFilled } from '@element-plus/icons-vue'
 import { toDoc } from '@/utils/doc'
+import { deleteApisByIds } from '@/api/api';
+// import moment from 'moment-timezone'
+
+// //moment.tz.setDefault('Asia / Shanghai')
+// moment.updateLocale('zh-cn', {
+//     timezone: 'Asia/Shanghai'
+// })
 
 defineOptions({
     name: 'Api',
@@ -137,31 +125,48 @@ const methodFilter = (value) => {
 
 const apis = ref([])
 const form = ref({
-    path: '',
-    apiGroup: '',
-    method: '',
-    description: ''
+    period: 1,
+    name: '',
+    principal: '',
+    describe: '',
+    priority: ''
 })
 const methodOptions = ref([
     {
-        value: 'POST',
-        label: '创建',
-        type: 'success'
+        value: 'P1',
+        label: 'P1',
     },
     {
-        value: 'GET',
-        label: '查看',
-        type: ''
+        value: 'P2',
+        label: 'P2',
     },
     {
-        value: 'PUT',
-        label: '更新',
-        type: 'warning'
+        value: 'P3',
+        label: 'P3',
     },
     {
-        value: 'DELETE',
-        label: '删除',
-        type: 'danger'
+        value: 'P4',
+        label: 'P4',
+    },
+    {
+        value: 'P5',
+        label: 'P5',
+    },
+    {
+        value: 'P6',
+        label: 'P6',
+    },
+    {
+        value: 'P7',
+        label: 'P7',
+    },
+    {
+        value: 'P8',
+        label: 'P8',
+    },
+    {
+        value: 'P9',
+        label: 'P9',
     }
 ])
 
@@ -183,7 +188,9 @@ const page = ref(1)
 const total = ref(0)
 const pageSize = ref(10)
 const tableData = ref([])
-const searchInfo = ref({})
+const searchInfo = ref({
+    //created_at: Date.now()
+})
 
 const onReset = () => {
     searchInfo.value = {}
@@ -221,7 +228,7 @@ const sortChange = ({ prop, order }) => {
 
 // 查询
 const getTableData = async () => {
-    const table = await getApiList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getProjectList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -270,10 +277,17 @@ const apiForm = ref(null)
 const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
-        path: '',
-        apiGroup: '',
-        method: '',
-        description: ''
+        period: 1,
+        name: '',
+        principal: '',
+        describe: '',
+        priority: ''
+    }
+}
+
+const pickerOptionsStart = (time) => {
+    if (this.searchData.closeTime) {
+        return time.getTime() >= new Date(this.searchData.closeTime).getTime()
     }
 }
 
@@ -299,8 +313,8 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-    const res = await getApiById({ id: row.ID })
-    form.value = res.data.api
+    const res = await getProjectById({ id: row.ID })
+    form.value = res.data.project
     openDialog('edit')
 }
 
@@ -310,7 +324,7 @@ const enterDialog = async () => {
             switch (type.value) {
                 case 'addApi':
                     {
-                        const res = await createApi(form.value)
+                        const res = await createProject(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -325,7 +339,7 @@ const enterDialog = async () => {
                     break
                 case 'edit':
                     {
-                        const res = await updateApi(form.value)
+                        const res = await updateProject(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -359,7 +373,7 @@ const deleteApiFunc = async (row) => {
         type: 'warning'
     })
         .then(async () => {
-            const res = await deleteApi(row)
+            const res = await deleteProject(row)
             if (res.code === 0) {
                 ElMessage({
                     type: 'success',
@@ -372,7 +386,6 @@ const deleteApiFunc = async (row) => {
             }
         })
 }
-
 </script>
 
 <style scoped lang="scss">
