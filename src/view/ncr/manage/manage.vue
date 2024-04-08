@@ -16,8 +16,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="类别" prop="method" style="width:16%">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in genreList1" :key="item.genre" :label="item.name" :value="item.genre">
+                    <el-select v-model="searchInfo.apiGroup" placeholder="请选择">
+                        <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -65,11 +65,6 @@
                 <el-table-column align="left" label="责任部门" min-width="150" prop="duty_department" sortable="custom" />
                 <el-table-column align="left" label="检验日期" min-width="150" prop="checkout_date" sortable="custom" />
                 <el-table-column align="left" label="填表日期" min-width="150" prop="fill_from_date" sortable="custom">
-                    <template #default="scope">
-                        <div>
-                            {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
-                        </div>
-                    </template>
                 </el-table-column>
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
@@ -112,7 +107,7 @@
                 </el-form-item>
                 <el-form-item label="类别" prop="category" style="width:20%">
                     <el-select v-model="form.category" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in genreList1" :key="item.genre" :label="`${item.name}`"
+                        <el-option v-for="item in genreList1" :key="item.name" :label="`${item.genre}`"
                             :value="item.genre" />
                     </el-select>
                 </el-form-item>
@@ -180,8 +175,8 @@
                         :rows="10" />
                 </el-form-item>
                 <el-form-item label="图片上传" prop="photograph" style="width:100%">
-                    <el-upload class="upload-demo" action="/api/fileUploadAndDownload/upload" :on-change="handleChange"
-                        :file-list="fileList">
+                    <el-upload class="upload-demo" action="/api/fileUploadAndDownload/upload" :file-list="fileList"
+                        :before-upload="beforeUpload">
                         <el-button size="small" type="primary">点击上传</el-button>
                         <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
                     </el-upload>
@@ -196,14 +191,18 @@
         </el-dialog>
     </div>
 </template>
-
+<!-- @click="uploadImg" -->
 <script setup>
 import {
     getAuthorityList,
     getGenreList,
     getSupplierList,
     getProjectList,
-
+    deleteManage,
+    updateManage,
+    getManageById,
+    createManage,
+    getManageList
 } from '@/api/manage.js'
 import { toSQLLine } from '@/utils/stringFun'
 import WarningBar from '@/components/warningBar/warningBar.vue'
@@ -226,9 +225,8 @@ const departmentList = ref([])
 const genreList1 = ref([])
 const supplierList = ref([])
 const projectList = ref([])
-const fileList = ref([
-    { name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }, { name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100' }
-])
+const fileList = ref([])
+
 const form = ref({
     serialnumber: "",
     department: "",
@@ -314,6 +312,27 @@ const searchInfo = ref({})
 const onReset = () => {
     searchInfo.value = {}
 }
+
+const beforeUpload = (file) => {
+    var FileExt = file.name.replace(/.+\./, "")
+    const isLt5M = file.size / 1024 / 1024 < 5
+    var extension = ['exe', 'iso'].indexOf(FileExt.toLowerCase()) === -1
+    if (!extension) {
+        ElMessage({
+            type: 'warning',
+            message: '禁止上传 exe, iso 文件！'
+        })
+        return false
+    }
+    if (!isLt5M) {
+        ElMessage({
+            type: 'warning',
+            message: '附件大小超限，文件不能超过 5M'
+        })
+        return false
+    }
+}
+
 // 搜索
 
 const onSubmit = () => {
@@ -342,6 +361,11 @@ const sortChange = ({ prop, order }) => {
         searchInfo.value.orderKey = toSQLLine(prop)
         searchInfo.value.desc = order === 'descending'
     }
+    getTableData()
+}
+
+const handleChange = async () => {
+
     getTableData()
 }
 
@@ -388,13 +412,13 @@ project()
 
 // 查询
 const getTableData = async () => {
-    // const table = await getApiList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
-    // if (table.code === 0) {
-    //     tableData.value = table.data.list
-    //     total.value = table.data.total
-    //     page.value = table.data.page
-    //     pageSize.value = table.data.pageSize
-    // }
+    const table = await getManageList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        tableData.value = table.data.list
+        total.value = table.data.total
+        page.value = table.data.page
+        pageSize.value = table.data.pageSize
+    }
 }
 
 getTableData()
@@ -487,8 +511,9 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-    const res = await getApiById({ id: row.ID })
+    const res = await getManageById({ id: row.ID })
     form.value = res.data.api
+    fileList = form.value.photograph
     openDialog('edit')
 }
 
@@ -498,7 +523,8 @@ const enterDialog = async () => {
             switch (type.value) {
                 case 'addApi':
                     {
-                        const res = await createApi(form.value)
+                        form.value.photograph = JSON.stringify(fileList)
+                        const res = await createManage(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -513,7 +539,7 @@ const enterDialog = async () => {
                     break
                 case 'edit':
                     {
-                        const res = await updateApi(form.value)
+                        const res = await updateManage(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -547,7 +573,7 @@ const deleteApiFunc = async (row) => {
         type: 'warning'
     })
         .then(async () => {
-            const res = await deleteApi(row)
+            const res = await deleteManage(row)
             if (res.code === 0) {
                 ElMessage({
                     type: 'success',
