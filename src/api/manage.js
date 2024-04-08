@@ -96,3 +96,20 @@ export const deleteManage = (data) => {
     data,
   });
 };
+
+//upload
+export const uploadFile = (data) => {
+  return service({
+    url: "/fileUploadAndDownload/upload",
+    method: "post",
+    transformRequest: [
+      function (data, headers) {
+        // 去除post请求默认的Content-Type
+        // delete headers["Content-Type"];
+        return data;
+      },
+    ],
+    data: data,
+    timeout: 300000,
+  });
+};
