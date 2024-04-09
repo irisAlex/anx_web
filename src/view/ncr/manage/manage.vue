@@ -74,16 +74,31 @@
                             @click="editApiFunc(scope.row, 'check')">查看</el-button>
                         <el-button icon="edit" type="primary" link
                             @click="editApiFunc(scope.row, 'edit')">修改</el-button>
-                        <el-button icon="tools" type="primary" link
-                            @click="editApiFunc(scope.row, 'rework')">返工</el-button>
-                        <el-button icon="setting" type="primary" link
-                            @click="editApiFunc(scope.row, 'repair')">返修</el-button>
-                        <el-button icon="finished" type="primary" link
-                            @click="editApiFunc(scope.row, 'pass')">让步接收</el-button>
-                        <el-button icon="finished" type="primary" link
-                            @click="editApiFunc(scope.row, 'parts')">配做</el-button>
-                        <el-button icon="setting" type="primary" link
-                            @click="editApiFunc(scope.row, 'die')">报废</el-button>
+                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
+                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '1')">
+                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'rework')"
+                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '1'">返工</el-button>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
+                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '2')">
+                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'repair')"
+                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '2'">返修</el-button>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
+                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '3')">
+                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'pass')"
+                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '3'">让步接收</el-button>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
+                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '4')">
+                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'parts')"
+                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '4'">配做</el-button>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
+                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '5')" >
+                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'die')"
+                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '5'">报废</el-button>
+                        </el-tooltip>
                         <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
                         <el-button icon="circle-close" type="primary" link
                             @click="editApiFunc(scope.row)">关闭</el-button>
@@ -716,6 +731,8 @@ const closeDialog = () => {
 const imgList = ref()
 
 const editApiFunc = async (row, operation) => {
+
+    console.log(row.operation_type)
     const res = await getManageById({ id: row.ID })
     form.value = res.data.manage
     if (form.value.photograph !== '') {
@@ -726,7 +743,6 @@ const editApiFunc = async (row, operation) => {
     if (form.value.rework_attachment !== '') {
         fileList1.value = JSON.parse(form.value.rework_attachment)
     }
-
     // if (form.value.repair_attachment !== '') {
     //     fileList2.value = JSON.parse(form.value.repair_attachment)
     // }

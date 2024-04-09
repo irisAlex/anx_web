@@ -46,21 +46,17 @@
         <div class="gva-table-box">
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
-                <el-table-column align="left" label="编号" min-width="150" prop="path" sortable="custom" />
-                <el-table-column align="left" label="部门" min-width="150" prop="apiGroup" sortable="custom" />
-                <el-table-column align="left" label="类型" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="类别" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="受检物名称" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="受检物号" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="状态" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="描述" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="附件及照片" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="计划时间" min-width="150" prop="description" sortable="custom">
-                    <template #default="scope">
-                        <div>
-                            {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
-                        </div>
-                    </template>
+                <el-table-column align="left" label="编号" min-width="150" prop="serialnumber" sortable="custom" />
+                <el-table-column align="left" label="部门" min-width="150" prop="department" sortable="custom" />
+                <el-table-column align="left" label="类型" min-width="150" prop="mold" sortable="custom" />
+                <el-table-column align="left" label="类别" min-width="150" prop="category" sortable="custom" />
+                <el-table-column align="left" label="受检物名称" min-width="150" prop="checkout_name" sortable="custom" />
+                <el-table-column align="left" label="受检物号" min-width="150" prop="checkout_number" sortable="custom" />
+                <el-table-column align="left" label="状态" min-width="150" prop="repair_desc" sortable="custom" />
+                <el-table-column align="left" label="描述" min-width="150" prop="repair_desc" sortable="custom" />
+                <el-table-column align="left" label="附件及照片" min-width="150" prop="repair_attachment"
+                    sortable="custom" />
+                <el-table-column align="left" label="计划时间" min-width="150" prop="repair_plan_date" sortable="custom">
                 </el-table-column>
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
@@ -86,14 +82,16 @@
 
 <script setup>
 import {
-    getApiById,
-    getApiList,
-    createApi,
-    updateApi,
-    deleteApi,
-    deleteApisByIds,
-    freshCasbin
-} from '@/api/api'
+    getAuthorityList,
+    getGenreList,
+    getSupplierList,
+    getProjectList,
+    deleteManage,
+    updateManage,
+    getManageById,
+    createManage,
+    getManageList
+} from '@/api/manage.js'
 import { toSQLLine } from '@/utils/stringFun'
 import WarningBar from '@/components/warningBar/warningBar.vue'
 import { ref } from 'vue'
@@ -112,34 +110,53 @@ const methodFilter = (value) => {
 
 const apis = ref([])
 const form = ref({
-    path: '',
-    apiGroup: '',
-    method: '',
-    description: ''
+    serialnumber: "",
+    department: "",
+    mold: "",
+    category: "",
+    project: "",
+    checkout_name: "",
+    checkout_number: "",
+    checkout_number: "",
+    repair_plan_date: "0001-01-01T00:00:00Z",
+    repair_desc: "",
+    repair_attachment: ""
 })
 const methodOptions = ref([
     {
-        value: 'POST',
-        label: '创建',
+        value: 'Just Do it',
+        label: 'Just Do it',
         type: 'success'
     },
     {
-        value: 'GET',
-        label: '查看',
+        value: 'A3',
+        label: 'A3',
         type: ''
     },
     {
-        value: 'PUT',
-        label: '更新',
+        value: '8D',
+        label: '8D',
         type: 'warning'
-    },
-    {
-        value: 'DELETE',
-        label: '删除',
-        type: 'danger'
     }
 ])
 
+const moldList = ref([
+    {
+        value: '内部',
+        label: '内部',
+        type: 'success'
+    },
+    {
+        value: '外部',
+        label: '外部',
+        type: ''
+    },
+    {
+        value: '配做',
+        label: '配做',
+        type: 'warning'
+    }
+])
 const type = ref('')
 const rules = ref({
     path: [{ required: true, message: '请输入api路径', trigger: 'blur' }],
@@ -194,9 +211,55 @@ const sortChange = ({ prop, order }) => {
     getTableData()
 }
 
+const departmentList = ref([])
+const genreList1 = ref([])
+const supplierList = ref([])
+const projectList = ref([])
+
+// 部门列表
+const department = async () => {
+    const table = await getAuthorityList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        departmentList.value = table.data.list
+    }
+}
+
+department()
+
+// 类别列表
+const genreList = async () => {
+    const table = await getGenreList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        genreList1.value = table.data.list
+    }
+}
+
+genreList()
+
+// 类别列表
+const supplier = async () => {
+    const table = await getSupplierList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        supplierList.value = table.data.list
+    }
+}
+
+supplier()
+
+// 类别列表
+const project = async () => {
+    const table = await getProjectList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        projectList.value = table.data.list
+    }
+}
+
+project()
+
+const operation = ref("2")
 // 查询
 const getTableData = async () => {
-    const table = await getApiList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getManageList({ page: page.value, pageSize: pageSize.value, keyword: operation.value, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -245,10 +308,17 @@ const apiForm = ref(null)
 const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
-        path: '',
-        apiGroup: '',
-        method: '',
-        description: ''
+        serialnumber: "",
+        department: "",
+        mold: "",
+        category: "",
+        project: "",
+        checkout_name: "",
+        checkout_number: "",
+        checkout_number: "",
+        repair_plan_date: "0001-01-01T00:00:00Z",
+        repair_desc: "",
+        repair_attachment: ""
     }
 }
 

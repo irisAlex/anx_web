@@ -119,36 +119,13 @@ const form = ref({
     project: "",
     checkout_name: "",
     checkout_number: "",
-    graph_number: "",
-    version_number: "",
-    purchase_order: "",
-    production_order: "",
-    delivery_order: "",
-    packages_number: "",
-    reject_packages_number: "",
-    sample_checkout_number: "",
-    reject_sample_checkout_number: "",
-    supplier: "",
-    checkout_date: "",
-    describe: "",
-    photograph: "",
-    process_mode: "",
-    duty_department: "",
-    cause_desc: "",
-    fill_from_date: "",
-    disposal_concept: "",
     rework_number: 0,
     rework_man_hour: 0,
     rework_quantities: "",
     rework_process: "",
     rework_plan_date: "0001-01-01T00:00:00Z",
     rework_desc: "",
-    rework_attachment: "",
-    repair_plan_date: "0001-01-01T00:00:00Z",
-    repair_desc: "",
-    repair_attachment: "",
-    parts_desc: "",
-    series: ""
+    rework_attachment: ""
 })
 const methodOptions = ref([
     {
@@ -344,38 +321,13 @@ const initForm = () => {
         project: "",
         checkout_name: "",
         checkout_number: "",
-        graph_number: "",
-        version_number: "",
-        purchase_order: "",
-        production_order: "",
-        delivery_order: "",
-        packages_number: "",
-        reject_packages_number: "",
-        sample_checkout_number: "",
-        reject_sample_checkout_number: "",
-        supplier: "",
-        checkout_date: "",
-        describe: "",
-        photograph: "",
-        process_mode: "",//处事方式
-        duty_department: "",
-        cause_desc: "", //原因分析
-        fill_from_date: "", //填表日期
-        disposal_concept: "",
         rework_number: 0,
         rework_man_hour: 0,
         rework_quantities: "",
         rework_process: "",
         rework_plan_date: "0001-01-01T00:00:00Z",
         rework_desc: "",
-        rework_attachment: "",
-        repair_plan_date: "0001-01-01T00:00:00Z",
-        repair_desc: "",
-        repair_attachment: "",
-        parts_desc: "",
-        series: ""
-        //处置方法
-
+        rework_attachment: ""
     }
 }
 const dialogTitle = ref('添加不合格品')
