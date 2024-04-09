@@ -70,12 +70,21 @@
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="view" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
-                        <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row)">修改</el-button>
+                        <el-button icon="view" type="primary" link
+                            @click="editApiFunc(scope.row, 'check')">查看</el-button>
+                        <el-button icon="edit" type="primary" link
+                            @click="editApiFunc(scope.row, 'edit')">修改</el-button>
+                        <el-button icon="tools" type="primary" link
+                            @click="editApiFunc(scope.row, 'rework')">返工</el-button>
+                        <el-button icon="setting" type="primary" link
+                            @click="editApiFunc(scope.row, 'repair')">返修</el-button>
+                        <el-button icon="finished" type="primary" link
+                            @click="editApiFunc(scope.row, 'pass')">让步接收</el-button>
+                        <el-button icon="finished" type="primary" link
+                            @click="editApiFunc(scope.row, 'parts')">配做</el-button>
+                        <el-button icon="setting" type="primary" link
+                            @click="editApiFunc(scope.row, 'die')">报废</el-button>
                         <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
-                        <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row)">返工</el-button>
-                        <el-button icon="setting" type="primary" link @click="editApiFunc(scope.row)">返修</el-button>
-                        <el-button icon="finished" type="primary" link @click="editApiFunc(scope.row)">让步接收</el-button>
                         <el-button icon="circle-close" type="primary" link
                             @click="editApiFunc(scope.row)">关闭</el-button>
                     </template>
@@ -89,105 +98,219 @@
 
         </div>
 
-        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="70%">
+        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="50%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="编号" prop="serialnumber" style="width:25%">
-                    <el-input placeholder="编号" size="mini" v-model="form.serialnumber" :disabled="isFormDisabled" />
+                <el-form-item label="编号:" prop="serialnumber" style="width:25%">
+                    <p v-show="isNcr">{{ form.serialnumber }}</p>
+                    <el-input placeholder="编号" size="mini" v-model="form.serialnumber" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="部门" prop="department" style="width:20%">
-                    <el-select v-model="form.department" placeholder="北京安新" style="width:100%"
-                        :disabled="isFormDisabled">
+                <el-form-item label="部门:" prop="department" style="width:20%">
+                    <span v-show="isNcr">{{ form.department }}</span>
+
+                    <el-select v-model="form.department" placeholder="北京安新" style="width:100%" v-if="isNcrDisabled">
                         <el-option v-for="item in departmentList" :key="item.authorityName"
                             :label="`${item.authorityName}`" :value="item.authorityName" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型" prop="mold" style="width:20%">
-                    <el-select v-model="form.mold" placeholder="请选择" style="width:100%">
+                <el-form-item label="类型:" prop="mold" style="width:20%">
+                    <span v-show="isNcr">{{ form.mold }}</span>
+
+                    <el-select v-model="form.mold" placeholder="请选择" style="width:100%" v-if="isNcrDisabled">
                         <el-option v-for="item in moldList" :key="item.value" :label="`${item.label}`"
                             :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别" prop="category" style="width:20%">
-                    <el-select v-model="form.category" placeholder="请选择" style="width:100%">
+                <el-form-item label="类别:" prop="category" style="width:20%">
+                    <span v-show="isNcr">{{ form.category }}</span>
+
+                    <el-select v-model="form.category" placeholder="请选择" style="width:100%" v-if="isNcrDisabled">
                         <el-option v-for="item in genreList1" :key="item.genre" :label="`${item.genre}`"
                             :value="item.genre" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="处理方式" prop="process_mode" style="width:30%">
-                    <el-select v-model="form.process_mode" placeholder="请选择" style="width:100%">
+                <el-form-item label="处理方式:" prop="process_mode" style="width:30%">
+                    <span v-show="isNcr">{{ form.process_mode }}</span>
+
+                    <el-select v-model="form.process_mode" placeholder="请选择" style="width:100%" v-if="isNcrDisabled">
                         <el-option v-for="item in methodOptions" :key="item.value" :label="`${item.label}`"
                             :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="项目" prop="project" style="width:30%">
-                    <el-select v-model="form.project" placeholder="请选择" style="width:100%">
+                <el-form-item label="项目:" prop="project" style="width:30%">
+                    <span v-show="isNcr">{{ form.project }}</span>
+
+                    <el-select v-model="form.project" placeholder="请选择" style="width:100%" v-if="isNcrDisabled">
                         <el-option v-for="item in projectList" :key="item.name" :label="`${item.name}`"
                             :value="item.name" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称" prop="checkout_name" style="width:30%">
-                    <el-input placeholder="受检物名称" size="mini" v-model="form.checkout_name" />
+                <el-form-item label="受检物名称:" prop="checkout_name" style="width:30%">
+                    <span v-show="isNcr">{{ form.checkout_name }}</span>
+
+                    <el-input placeholder="受检物名称" size="mini" v-model="form.checkout_name" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="受检物号" prop="checkout_number" style="width:30%">
-                    <el-input placeholder="受检物号" size="mini" v-model="form.checkout_number" />
+                <el-form-item label="受检物号:" prop="checkout_number" style="width:30%">
+                    <span v-show="isNcr">{{ form.checkout_number }}</span>
+
+                    <el-input placeholder="受检物号" size="mini" v-model="form.checkout_number" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="图纸号" prop="graph_number" style="width:30%">
-                    <el-input placeholder="图纸号" size="mini" v-model="form.graph_number" />
+                <el-form-item label="图纸号:" prop="graph_number" style="width:30%">
+                    <span v-show="isNcr">{{ form.graph_number }}</span>
+
+                    <el-input placeholder="图纸号" size="mini" v-model="form.graph_number" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="版本号" prop="version_number" style="width:30%">
-                    <el-input placeholder="版本号" size="mini" v-model="form.version_number" />
+                <el-form-item label="版本号:" prop="version_number" style="width:30%">
+                    <span v-show="isNcr">{{ form.version_number }}</span>
+
+                    <el-input placeholder="版本号" size="mini" v-model="form.version_number" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="采购订单号" prop="purchase_order" style="width:30%">
-                    <el-input placeholder="采购订单号" size="mini" v-model="form.purchase_order" />
+                <el-form-item label="采购订单号:" prop="purchase_order" style="width:30%">
+                    <span v-show="isNcr">{{ form.purchase_order }}</span>
+
+                    <el-input placeholder="采购订单号" size="mini" v-model="form.purchase_order" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="生产订单号" prop="production_order" style="width:30%">
-                    <el-input placeholder="生产订单号" size="mini" v-model="form.production_order" />
+                <el-form-item label="生产订单号:" prop="production_order" style="width:30%">
+                    <span v-show="isNcr">{{ form.production_order }}</span>
+
+                    <el-input placeholder="生产订单号" size="mini" v-model="form.production_order" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="发货单号" prop="delivery_order" style="width:30%">
-                    <el-input placeholder="发货单号" size="mini" v-model="form.delivery_order" />
+                <el-form-item label="发货单号:" prop="delivery_order" style="width:30%">
+                    <span v-show="isNcr">{{ form.delivery_order }}</span>
+
+                    <el-input placeholder="发货单号" size="mini" v-model="form.delivery_order" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="收货数量" prop="packages_number" style="width:30%">
-                    <el-input placeholder="收货数量" size="mini" v-model.number="form.packages_number" />
+                <el-form-item label="收货数量:" prop="packages_number" style="width:30%">
+                    <span v-show="isNcr">{{ form.packages_number }}</span>
+
+                    <el-input placeholder="收货数量" size="mini" v-model.number="form.packages_number"
+                        v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="货物拒收数量" prop="reject_packages_number" style="width:30%">
-                    <el-input placeholder="货物拒收数量" size="mini" v-model.number="form.reject_packages_number" />
+                <el-form-item label="货物拒收数量:" prop="reject_packages_number" style="width:30%">
+                    <span v-show="isNcr">{{ form.reject_packages_number }}</span>
+
+                    <el-input placeholder="货物拒收数量" size="mini" v-model.number="form.reject_packages_number"
+                        v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="样品检验数量" prop="sample_checkout_number" style="width:30%">
-                    <el-input placeholder="样品检验数量" size="mini" v-model.number="form.sample_checkout_number" />
+                <el-form-item label="样品检验数量:" prop="sample_checkout_number" style="width:30%">
+                    <span v-show="isNcr">{{ form.sample_checkout_number }}</span>
+
+                    <el-input placeholder="样品检验数量" size="mini" v-model.number="form.sample_checkout_number"
+                        v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="样品拒收数量" prop="reject_sample_checkout_number" style="width:30%">
-                    <el-input placeholder="样品拒收数量" size="mini" v-model.number="form.reject_sample_checkout_number" />
+                <el-form-item label="样品拒收数量:" prop="reject_sample_checkout_number" style="width:30%">
+                    <span v-show="isNcr">{{ form.reject_sample_checkout_number }}</span>
+
+                    <el-input placeholder="样品拒收数量" size="mini" v-model.number="form.reject_sample_checkout_number"
+                        v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="责任部门" prop="duty_department" style="width:30%">
-                    <el-input placeholder="责任部门" size="mini" v-model="form.duty_department" />
+                <el-form-item label="责任部门:" prop="duty_department" style="width:30%">
+                    <span v-show="isNcr">{{ form.duty_department }}</span>
+
+                    <el-input placeholder="责任部门" size="mini" v-model="form.duty_department" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="供应商" prop="supplier" style="width:30%">
-                    <el-select v-model="form.supplier" placeholder="供应商" style="width:100%">
+                <el-form-item label="供应商:" prop="supplier" style="width:30%">
+                    <span v-show="isNcr">{{ form.supplier }}</span>
+
+                    <el-select v-model="form.supplier" placeholder="供应商" style="width:100%" v-if="isNcrDisabled">
                         <el-option v-for="item in supplierList" :key="item.name" :label="`${item.genre}`"
                             :value="item.name" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="检验日期" prop="checkout_date" style="width:30%">
+                <el-form-item label="检验日期:" prop="checkout_date" style="width:30%">
+                    <span v-show="isNcr">{{ form.checkout_date }}</span>
+
                     <el-date-picker v-model="form.checkout_date" type="date" placeholder="选择日期"
-                        value-format="YYYY-MM-DDT15:04:05Z">
+                        value-format="YYYY-MM-DDT15:04:05Z" v-if="isNcrDisabled">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="不合格描述" prop="describe" style="width:80%">
+                <el-form-item label="不合格描述:" prop="describe" style="width:80%">
+                    <span v-show="isNcr">{{ form.describe }}</span>
+
                     <el-input type="textarea" placeholder="请输入内容" v-model="form.describe" maxlength="50" show-word-limit
-                        :rows="10" />
+                        :rows="10" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="图片上传" prop="photograph" style="width:100%">
+                <el-form-item label="NCR图片:" prop="photograph" style="width:100%">
+                    <span v-show="isNcr" v-for="item in imgList">{{ item.url }} </span>
+                    <el-image v-for="item in imgList" style="width: 100px; height: 100px" :src="item.url">
+                        </el-image>
                     <el-upload action="/api/fileUploadAndDownload/upload" multiple :limit="2" :file-list="fileList"
-                        :on-success="handleSuccess" show-file-list="false" :on-remove="handleRemove">
+                        :on-success="handleSuccess" show-file-list="false" :on-remove="handleRemove"
+                        v-if="isNcrDisabled">
                         <el-button size="small" type="primary">点击上传</el-button>
                         <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
                     </el-upload>
                 </el-form-item>
+                <!-- rework 返工 -->
+                <div v-if="isRework">
+                    <el-form-item label="数量" prop="rework_number" style="width:22%">
+                        <el-input placeholder="责任部门" size="mini" v-model.number="form.rework_number" />
+                    </el-form-item>
+                    <el-form-item label="工时" prop="rework_man_hour" style="width:22%">
+                        <el-input placeholder="责任部门" size="mini" v-model.number="form.rework_man_hour" />
+                    </el-form-item>
+                    <el-form-item label="工料" prop="rework_quantities" style="width:22%">
+                        <el-input placeholder="责任部门" size="mini" v-model="form.rework_quantities" />
+                    </el-form-item>
+                    <el-form-item label="工序" prop="rework_process" style="width:22%">
+                        <el-input placeholder="责任部门" size="mini" v-model="form.rework_process" />
+                    </el-form-item>
+                    <el-form-item label="返工计划完成时间" prop="rework_plan_date" style="width:20%">
+                        <el-date-picker v-model="form.rework_plan_date" type="date" placeholder="选择日期"
+                            value-format="YYYY-MM-DDT15:04:05Z">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="返工描述" prop="rework_desc" style="width:100%">
+                        <el-input type="textarea" placeholder="请输入内容" v-model="form.rework_desc" maxlength="50"
+                            show-word-limit :rows="10" />
+                    </el-form-item>
+                    <el-form-item label="返工证据" prop="rework_attachment" style="width:100%">
+                        <el-upload action="/api/fileUploadAndDownload/upload" multiple :limit="2" :file-list="FileList1"
+                            :on-success="handleSuccess1" show-file-list="false" :on-remove="handleRemove1">
+                            <el-button size="small" type="primary">点击上传</el-button>
+                            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                        </el-upload>
+                    </el-form-item>
+                </div>
+
+                <!-- repair 返修 -->
+                <div v-if="isRepair">
+                    <el-form-item label="返修计划完成时间" prop="repair_plan_date" style="width:20%">
+                        <el-date-picker v-model="form.rework_plan_date" type="date" placeholder="选择日期"
+                            value-format="YYYY-MM-DDT15:04:05Z">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="返修描述" prop="repair_desc" style="width:100%">
+                        <el-input type="textarea" placeholder="请输入内容" v-model="form.rework_desc" maxlength="50"
+                            show-word-limit :rows="10" />
+                    </el-form-item>
+                    <el-form-item label="返修附件" prop="repair_attachment" style="width:100%">
+                        <el-upload action="/api/fileUploadAndDownload/upload" multiple :limit="2" :file-list="fileList2"
+                            :on-success="handleSuccess2" show-file-list="false" :on-remove="handleRemove2">
+                            <el-button size="small" type="primary">点击上传</el-button>
+                            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                        </el-upload>
+                    </el-form-item>
+                </div>
+
+                <!-- 配做  -->
+                <div v-if="isParts">
+                    <el-form-item label="配做方案" prop="rework_desc" style="width:100%">
+                        <el-input type="textarea" placeholder="请输入内容" v-model="form.rework_desc" maxlength="50"
+                            show-word-limit :rows="10" />
+                    </el-form-item>
+                    <el-form-item label="配做系列" prop="rework_attachment" style="width:100%">
+                        <el-upload action="/api/fileUploadAndDownload/upload" multiple :limit="2" :file-list="fileList"
+                            :on-success="handleSuccess" show-file-list="false" :on-remove="handleRemove">
+                            <el-button size="small" type="primary">点击上传</el-button>
+                            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                        </el-upload>
+                    </el-form-item>
+                </div>
             </el-form>
             <template #footer>
                 <div class="dialog-footer">
-                    <el-button @click="closeDialog">取 消</el-button>
-                    <el-button type="primary" @click="enterDialog">确 定</el-button>
+                    <el-button @click="closeDialog" v-if="isFormDisabled">取 消</el-button>
+                    <el-button type="primary" @click="enterDialog" v-if="isFormDisabled">确 定</el-button>
                 </div>
             </template>
         </el-dialog>
@@ -217,8 +340,12 @@ import { toDoc } from '@/utils/doc'
 defineOptions({
     name: 'Api',
 })
-const isFormDisabled = ref(true);
-
+const isFormDisabled = ref(false)
+const isNcr = ref(false)
+const isNcrDisabled = ref(true)
+const isRework = ref(false)
+const isRepair = ref(false)
+const isParts = ref(false)
 const beforeImageUpload = (file) => {
     const isJPG = file.type === 'image/jpeg'
     const isPng = file.type === 'image/png'
@@ -247,7 +374,8 @@ const genreList1 = ref([])
 const supplierList = ref([])
 const projectList = ref([])
 const fileList = ref([])
-
+const fileList1 = ref([])
+const fileList2 = ref([])
 const form = ref({
     serialnumber: "",
     department: "",
@@ -273,7 +401,14 @@ const form = ref({
     duty_department: "",
     cause_desc: "",
     fill_from_date: "",
-    disposal_concept: ""
+    disposal_concept: "",
+    rework_number: 0,
+    rework_man_hour: 0,
+    rework_quantities: "",
+    rework_process: "",
+    rework_plan_date: "",
+    rework_desc: "",
+    rework_attachment: ""
 })
 const methodOptions = ref([
     {
@@ -345,6 +480,35 @@ const handleRemove = (file, fileList) => {
         fileList.splice(index, 1);
     }
     form.value.photograph = JSON.stringify(fileList.value)
+};
+
+//返工图片处理
+const handleSuccess1 = (resp) => {
+    fileList1.value.push({ name: resp.data.file.name, url: resp.data.file.url })
+    form.value.photograph = JSON.stringify(fileList1.value)
+};
+
+const handleRemove1 = (file, fileList) => {
+    // 处理删除文件的逻辑，例如从文件列表中删除文件
+    const index = fileList1.indexOf(file);
+    if (index !== -1) {
+        fileList.splice(index, 1);
+    }
+    form.value.photograph = JSON.stringify(fileList1.value)
+};
+//返修图片处理
+const handleSuccess2 = (resp) => {
+    fileList2.value.push({ name: resp.data.file.name, url: resp.data.file.url })
+    form.value.photograph = JSON.stringify(fileList2.value)
+};
+
+const handleRemove2 = (file, fileList) => {
+    // 处理删除文件的逻辑，例如从文件列表中删除文件
+    const index = fileList2.indexOf(file);
+    if (index !== -1) {
+        fileList2.splice(index, 1);
+    }
+    form.value.photograph = JSON.stringify(fileList2.value)
 };
 
 
@@ -514,19 +678,57 @@ const initForm = () => {
         duty_department: "",
         cause_desc: "", //原因分析
         fill_from_date: "", //填表日期
-        disposal_concept: "" //处置方法
+        disposal_concept: "",
+        rework_number: 0,
+        rework_man_hour: 0,
+        rework_quantities: "",
+        rework_process: "",
+        rework_plan_date: "",
+        rework_desc: "",
+        rework_attachment: ""
+        //处置方法
+
     }
 }
 
-const dialogTitle = ref('添加不合格品')
+const dialogTitle = ref('创建NCR')
 const dialogFormVisible = ref(false)
+
 const openDialog = (key) => {
+    isNcr.value = true
+    isRework.value = false
+    isRepair.value = false
+    isParts.value = false
+    console.log(isRework.value)
     switch (key) {
         case 'addApi':
             dialogTitle.value = '创建NCR'
+            isNcr.value = false
             break
         case 'edit':
             dialogTitle.value = '编辑NCR'
+            isNcr.value = false
+            break
+        case 'rework':
+            dialogTitle.value = '创建/修改返工订单'
+            isRework.value = true
+            isNcrDisabled.value = false
+            break
+        case 'repair':
+            dialogTitle.value = '创建/修改返修订单'
+            isRepair.value = true
+            isNcrDisabled.value = false
+            break
+        case 'parts':
+            dialogTitle.value = '创建/修改配做订单'
+            isParts.value = true
+            isNcrDisabled.value = false
+            break
+        case 'check':
+            dialogTitle.value = '查看NCR'
+            isFormDisabled.value = false
+            isNcr.value = true
+            isNcrDisabled.value = false
             break
         default:
             break
@@ -534,20 +736,29 @@ const openDialog = (key) => {
     type.value = key
     dialogFormVisible.value = true
 }
+
 const closeDialog = () => {
     initForm()
+    isNcrDisabled.value = true
+    isNcr.value = false
+    isRework.value = false
+    isRepair.value = false
+    isParts.value = false
     dialogFormVisible.value = false
 }
 
-const editApiFunc = async (row) => {
+const imgList = ref()
+
+const editApiFunc = async (row, operation) => {
     const res = await getManageById({ id: row.ID })
     form.value = res.data.manage
     if (form.value.photograph !== '') {
         fileList.value = JSON.parse(form.value.photograph)
+        imgList.value = fileList.value
     }
-    openDialog('edit')
-}
+    openDialog(operation)
 
+}
 const enterDialog = async () => {
     apiForm.value.validate(async valid => {
         if (valid) {
@@ -568,9 +779,11 @@ const enterDialog = async () => {
                         getTableData()
                         closeDialog()
                     }
-
                     break
                 case 'edit':
+                case 'rework':
+                case 'repair':
+                case 'parts':
                     {
                         const res = await updateManage(form.value)
                         if (res.code === 0) {
