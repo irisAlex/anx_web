@@ -91,6 +91,24 @@ export default class ImageCompress {
   }
 }
 
+const beforeImageUpload = (file) => {
+  const isJPG = file.type === 'image/jpeg'
+  const isPng = file.type === 'image/png'
+  if (!isJPG && !isPng) {
+      ElMessage.error('上传头像图片只能是 jpg或png 格式!')
+      return false
+  }
+
+  const isRightSize = file.size / 1024 < props.fileSize
+  if (!isRightSize) {
+      // 压缩
+      const compress = new ImageCompress(file, props.fileSize, props.maxWH)
+      return compress.compress()
+  }
+  return isRightSize
+}
+
+
 const path = import.meta.env.VITE_FILE_API + '/'
 export const getUrl = (url) => url && url.slice(0, 4) !== 'http' ? path + url : url
 
