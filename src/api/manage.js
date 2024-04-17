@@ -113,3 +113,83 @@ export const uploadFile = (data) => {
     timeout: 300000,
   });
 };
+
+//set status 
+
+//upload
+export const setStatus = (data) => {
+  return service({
+    url: "/manage/updateSetStatus",
+    method: "post",
+    data,
+  });
+};
+
+export const setPassDate = (data) => {
+  return service({
+    url: "/manage/updatePassDate",
+    method: "post",
+    data,
+  });
+};
+
+
+export const setNcr = (data) => {
+  return service({
+    url: "/manage/updateNcr",
+    method: "post",
+    data,
+  });
+};
+
+export const updateParts = (data) => {
+  return service({
+    url: "/manage/updateParts",
+    method: "post",
+    data,
+  });
+};
+
+//获取用户
+export const getUserInfo = () => {
+  return service({
+    url: '/user/getUserInfo',
+    method: 'get'
+  })
+}
+
+//获取部门用户
+export const getUserAuthorityList = (data) => {
+  return service({
+    url: '/user/getUserList',
+    method: 'post',
+    data: data
+  })
+}
+
+//获取部门用户
+export const sendMessage = (data) => {
+  return service({
+    url: '/message/sendMessage',
+    method: 'post',
+    data: data
+  })
+}
+
+//获取部门用户
+export const getMessage = (data) => {
+  return service({
+    url: '/message/getMessageByName',
+    method: 'post',
+    data: data
+  })
+}
+
+//获取部门用户
+export const setMessageState = (data) => {
+  return service({
+    url: '/message/setMessageState',
+    method: 'post',
+    data: data
+  })
+}

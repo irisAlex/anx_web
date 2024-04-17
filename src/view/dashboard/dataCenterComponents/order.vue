@@ -1,26 +1,24 @@
 <template>
   <div class="ReclaimMileage-box">
-    <div
-      ref="echart"
-      class="ReclaimMileage-box-echarts"
-      :style="`width : ${chart?.clientWidth}px`"
-    />
+    <div ref="echart" class="ReclaimMileage-box-echarts" :style="`width : ${chart?.clientWidth}px`" />
 
     <div class="ReclaimMileage-box-data">
+      <div class="ReclaimMileage-box-data-left" style="margin-right: 50px;">
+        <div>返工订单</div>
+        <div class="number">{{ rework.length }} </div>
+        <!-- <div>昨日:7902</div> -->
+      </div>
+      <div class="ReclaimMileage-box-data-left" style="margin-right: 40px;">
+        <div>返修订单</div>
+        <div class="number">{{ repair.length }} </div>
+      </div>
       <div class="ReclaimMileage-box-data-left">
-        <div>SH</div>
-        <div class="number">9,023 <span style="color: #D3B379">-36% ↓</span></div>
-        <div>昨日:7902</div>
+        <div>让步放行</div>
+        <div class="number">{{ pass.length }} </div>
       </div>
-      <div class="ReclaimMileage-box-data-center">
-        <div>MI</div>
-        <div class="number">3,067 <span>-62% ↓</span></div>
-        <div>昨日:1203</div>
-      </div>
-      <div class="ReclaimMileage-box-data-right">
-        <div>AZ</div>
-        <div class="number">1,298 <span >-57% ↓</span></div>
-        <div>昨日:679</div>
+      <div class="ReclaimMileage-box-data-left" style="margin-left: 30px;">
+        <div>配做订单</div>
+        <div class="number">{{ parts.length }}</div>
       </div>
     </div>
 
@@ -29,16 +27,62 @@
 <script setup>
 import * as echarts from 'echarts'
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-
+import {
+  getManageList
+} from '@/api/manage.js'
 const chart = ref(null)
 const echart = ref(null)
-const initChart = () => {
-  chart.value = echarts.init(echart.value)
-  setOptions()
-  document.addEventListener('resize', () => {
-    chart.value?.resize()
+const rework = ref([])
+const repair = ref([])
+const parts = ref([])
+const pass = ref([])
+const page = ref(1)
+const total = ref(0)
+const pageSize = ref(100000)
+const searchInfo = ref({})
+function initChart() {
+  getNcrCount();
+}
+
+const getNcrCount = async () => {
+  const res = await getManageList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  if (res.code === 0) {
+    statistics_department(res.data.list)
+    chart.value = echarts.init(echart.value)
+    setOptions()
+    document.addEventListener('resize', () => {
+      chart.value?.resize()
+    })
+    return
+  }
+  ElMessage({
+    type: 'error',
+    message: 'Network error',
+    showClose: true
   })
 }
+
+const statistics_department = (sd) => {
+  sd.forEach(item => {
+    switch (item.operation_type) {
+      case '返工':
+        rework.value.push(item.operation_type)
+        break
+      case '返修':
+        repair.value.push(item.operation_type)
+        break
+      case '配做':
+        parts.value.push(item.operation_type)
+        break
+      case '4':
+        pass.value.push(item.operation_type)
+        break
+      default:
+        break
+    }
+  })
+}
+
 
 const setOptions = () => {
   chart.value.setOption({
@@ -119,7 +163,7 @@ const setOptions = () => {
             ], false),
           }
         },
-        data: [220, 182, 191, 234, 290, 330, 310, 201, 154, 190, 330, 410]
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       },
     ]
   })
@@ -140,12 +184,12 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-
-.ReclaimMileage-box{
+.ReclaimMileage-box {
   height: 120px;
   overflow: hidden;
   position: relative;
-  &-echarts{
+
+  &-echarts {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -154,7 +198,8 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
   }
-  &-data{
+
+  &-data {
     position: absolute;
     top: 0;
     left: 0;
@@ -163,22 +208,25 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index : 10;
+    z-index: 10;
     user-select: none;
-    pointer-events:none;
-    &-left{
+    pointer-events: none;
+
+    &-left {
       height: 60%;
       display: flex;
       align-items: flex-start;
       flex-direction: column;
       justify-content: center;
-      div{
+
+      div {
         color: #999;
         font-size: 12px;
         margin-bottom: 8px;
       }
     }
-    &-center{
+
+    &-center {
       height: 60%;
       border-right: 1px solid #eee;
       border-left: 1px solid #eee;
@@ -186,21 +234,24 @@ onUnmounted(() => {
       align-items: flex-start;
       flex-direction: column;
       justify-content: center;
-      padding:0 10px ;
-      div{
+      padding: 0 10px;
+
+      div {
         color: #999;
         font-size: 12px;
         margin-bottom: 8px;
       }
     }
-    &-right{
+
+    &-right {
       height: 60%;
       padding-left: 10px;
       display: flex;
       align-items: flex-start;
       flex-direction: column;
       justify-content: center;
-      div{
+
+      div {
         color: #999;
         font-size: 12px;
         margin-bottom: 8px;
@@ -208,17 +259,21 @@ onUnmounted(() => {
     }
   }
 }
-.in-line{
-  --color : #5BC2A4;
+
+.in-line {
+  --color: #5BC2A4;
 }
-.out-line{
+
+.out-line {
   --color: #DF534E;
 }
-.number{
+
+.number {
   color: #1d1d1f !important;
   font-size: 18px !important;
   font-weight: 500;
-  span{
+
+  span {
     font-size: 12px;
     color: #DF534E;
     font-weight: 400;

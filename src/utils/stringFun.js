@@ -27,3 +27,9 @@ export const toHump = (name) => {
         return letter.toUpperCase();
     });
 }
+
+
+export const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString()
+}

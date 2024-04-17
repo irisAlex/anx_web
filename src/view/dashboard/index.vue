@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="data-center-box">
-      <CenterCard title="设备在线情况">
+      <CenterCard title="不合格品总计">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -9,7 +9,7 @@
           <ChainRatio />
         </template>
       </CenterCard>
-      <CenterCard title="回收里程(Km)">
+      <CenterCard title="不合格部门数">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -17,7 +17,7 @@
           <ReclaimMileage />
         </template>
       </CenterCard>
-      <CenterCard title="订单完成率">
+      <CenterCard title="不合格品分类">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -25,7 +25,7 @@
           <Order />
         </template>
       </CenterCard>
-      <CenterCard title="设备回收率">
+      <CenterCard title="总体不合格率">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -36,7 +36,7 @@
 
 
 
-      <CenterCard title="日活跃率" style="grid-column-start: span 3;">
+      <CenterCard title="不合格品处理" style="grid-column-start: span 3;">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -44,7 +44,7 @@
           <lineCharts />
         </template>
       </CenterCard>
-      <CenterCard title="源接入台数占比" style="grid-auto-columns: 1.5fr">
+      <CenterCard title="统计" style="grid-auto-columns: 1.5fr">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -74,8 +74,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.data-center-box{
+.data-center-box {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1.5fr 2fr 1.5fr;

@@ -1,15 +1,8 @@
 <template>
   <div class="search-component">
-    <div
-      class="gvaIcon gvaIcon-refresh"
-      :class="[reload ? 'reloading' : '']"
-      @click="handleReload"
-    />
+
+    <div class="gvaIcon gvaIcon-refresh" :class="[reload ? 'reloading' : '']" @click="handleReload" />
     <Screenfull class="search-icon" />
-    <div
-      class="gvaIcon gvaIcon-customer-service"
-      @click="toService"
-    />
   </div>
 </template>
 
@@ -30,21 +23,20 @@ const handleReload = () => {
     reload.value = false
   }, 500)
 }
-const toService = () => {
-  window.open('https://support.qq.com/product/371961')
-}
 
 </script>
 <style scoped lang="scss">
-
 .search-component {
   @apply inline-flex overflow-hidden text-center gap-5 mr-5;
-  div{
+
+  div {
     @apply cursor-pointer;
   }
+
   .el-input__inner {
     @apply border-b border-solid border-gray-300;
   }
+
   .el-dropdown-link {
     @apply cursor-pointer;
   }
@@ -54,8 +46,8 @@ const toService = () => {
   font-size: 18px;
 }
 
-.reloading{
-  animation:turn 0.5s linear infinite;
+.reloading {
+  animation: turn 0.5s linear infinite;
 }
 
 @keyframes turn {
@@ -79,5 +71,4 @@ const toService = () => {
     transform: rotate(360deg);
   }
 }
-
 </style>

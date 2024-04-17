@@ -3,29 +3,19 @@
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
                 <el-form-item label="反馈人">
-                    <el-select v-model="value" placeholder="北京安新">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                    </el-select>
+                    <el-input v-model="searchInfo.interior_feedback_name" placeholder="反馈人" />
                 </el-form-item>
                 <el-form-item label="反馈单位">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                    </el-select>
+                    <el-input v-model="searchInfo.interior_feedback_unit" placeholder="反馈单位" />
                 </el-form-item>
                 <el-form-item label="产品序列号">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                    </el-select>
+                    <el-input v-model="searchInfo.product_sequence" placeholder="产品序列号" />
                 </el-form-item>
                 <el-form-item label="产品名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="受检物名称" />
+                    <el-input v-model="searchInfo.product_name" placeholder="产品名称" />
                 </el-form-item>
                 <el-form-item label="创建时间">
-                    <el-date-picker v-model="value" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-                        :default-time="['00:00:00', '23:59:59']">
+                    <el-date-picker v-model="value" type="date" placeholder="创建时间">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
@@ -37,54 +27,62 @@
         <div class="gva-table-box">
             <div class="gva-btn-list">
                 <el-button type="primary" icon="plus" @click="openDialog('addApi')">新增</el-button>
-                <el-popover v-model="freshVisible" placement="top" width="160">
-                    <p>确定要刷新Casbin缓存吗？</p>
-                    <div style="text-align: right; margin-top: 8px;">
-                        <el-button type="primary" link @click="freshVisible = false">取消</el-button>
-                        <el-button type="primary" @click="onFresh">确定</el-button>
-                    </div>
-                    <template #reference>
-                        <el-button icon="Refresh" @click="freshVisible = true">刷新缓存</el-button>
-                    </template>
-                </el-popover>
             </div>
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
-                <el-table-column align="left" label="产品名称" min-width="150" prop="path" sortable="custom" />
-                <el-table-column align="left" label="产品序列号（物料编码）" min-width="230" prop="apiGroup" sortable="custom" />
-                <el-table-column align="left" label="客户名称" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="投诉人" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="项目" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="状态" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="受检物号" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="内部反馈人" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="内部反馈单位" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="问题描述（5W2H）附件照片" min-width="250" prop="description"
+                <el-table-column align="left" label="产品名称" min-width="150" prop="product_name" sortable="custom" />
+                <el-table-column align="left" label="产品序列号（物料编码）" min-width="230" prop="product_sequence"
                     sortable="custom" />
-                <el-table-column align="left" label="问题分级" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="短期措施/计划完成时间" min-width="250" prop="description"
+                <el-table-column align="left" label="客户名称" min-width="150" prop="client_name" sortable="custom" />
+                <el-table-column align="left" label="投诉人" min-width="150" prop="complaint_name" sortable="custom" />
+                <el-table-column align="left" label="项目" min-width="150" prop="project_name" sortable="custom" />
+                <el-table-column align="left" label="状态" min-width="150" prop="status" sortable="custom" />
+                <el-table-column align="left" label="受检物号" min-width="150" prop="checkout_number" sortable="custom" />
+                <el-table-column align="left" label="内部反馈人" min-width="150" prop="interior_feedback_name"
                     sortable="custom" />
-                <el-table-column align="left" label="原因分析/附件/描述" min-width="230" prop="description" sortable="custom" />
-                <el-table-column align="left" label="整改措施" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="客服订单" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="负责人" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="成本" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="整改计划完成时间" min-width="200" prop="description" sortable="custom" />
-                <el-table-column align="left" label="提交时间" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="关闭时间" min-width="150" prop="description" sortable="custom">
-
+                <el-table-column align="left" label="内部反馈单位" min-width="150" prop="interior_feedback_unit"
+                    sortable="custom" />
+                <el-table-column align="left" label="问题描述（5W2H）附件照片" min-width="250" prop="issue_desc"
+                    sortable="custom" />
+                <el-table-column align="left" label="问题分级" min-width="150" prop="issue_level" sortable="custom" />
+                <el-table-column align="left" label="短期措施/计划完成时间" min-width="250" prop="short_plan_date"
+                    sortable="custom">
                     <template #default="scope">
-                        <div>
-                            {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
-                        </div>
+                        <i class="el-icon-time"></i>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.short_plan_date) }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column align="left" label="原因分析/附件/描述" min-width="230" prop="cause_desc" sortable="custom" />
+                <el-table-column align="left" label="整改措施" min-width="150" prop="rectify" sortable="custom" />
+                <el-table-column align="left" label="客服订单" min-width="150" prop="complaint_order" sortable="custom" />
+                <el-table-column align="left" label="负责人" min-width="150" prop="principal_name" sortable="custom" />
+                <el-table-column align="left" label="成本" min-width="150" prop="cost" sortable="custom" />
+                <el-table-column align="left" label="整改计划完成时间" min-width="200" prop="rectify_date" sortable="custom">
+                    <template #default="scope">
+                        <i class="el-icon-time"></i>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.rectify_date) }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column align="left" label="提交时间" min-width="150" prop="submit_date" sortable="custom">
+                    <template #default="scope">
+                        <i class="el-icon-time"></i>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.submit_date) }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column align="left" label="关闭时间" min-width="150" prop="close_date" sortable="custom">
+                    <template #default="scope">
+                        <i class="el-icon-time"></i>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.close_date) }}</span>
                     </template>
                 </el-table-column>
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
                         <el-button icon="view" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
-                        <el-button icon="edit" type="primary" link @click="deleteApiFunc(scope.row)">修改</el-button>
-                        <el-button icon="delete" type="primary" link @click="editApiFunc(scope.row)">删除</el-button>
+                        <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row)">修改</el-button>
+                        <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
                         <el-button icon="circle-close" type="primary" link
                             @click="editApiFunc(scope.row)">关闭</el-button>
                     </template>
@@ -100,93 +98,79 @@
 
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="70%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="编号" prop="path" style="width:25%">
-                    <el-input placeholder="受检物名称" size="mini" />
+                <el-form-item label="产品名称" prop="product_name" style="width:20%">
+                    <el-input placeholder="产品名称" size="mini" v-model="form.product_name" />
                 </el-form-item>
-                <el-form-item label="部门" prop="method" style="width:20%">
-                    <el-select v-model="form.method" placeholder="北京安新" style="width:100%">
+                <el-form-item label="产品序列号(物料编码)" prop="product_sequence" style="width:20%">
+                    <el-input placeholder="产品序列号(物料编码)" size="mini" v-model="form.product_sequence" />
+                </el-form-item>
+                <el-form-item label="客户名称" prop="client_name" style="width:20%">
+                    <el-input placeholder="客户名称" size="mini" v-model="form.client_name" />
+                </el-form-item>
+                <el-form-item label="投诉人" prop="complaint_name" style="width:20%">
+                    <el-input placeholder="投诉人" size="mini" v-model="form.complaint_name" />
+                </el-form-item>
+                <el-form-item label="项目" prop="project_name" style="width:20%">
+                    <el-input placeholder="项目" size="mini" v-model="form.project_name" />
+                </el-form-item>
+                <!-- <el-form-item label="状态" prop="status" style="width:20%">
+                    <el-input placeholder="状态" size="mini" v-model="form.status" />
+                </el-form-item> -->
+                <el-form-item label="受检物号" prop="checkout_number" style="width:20%">
+                    <el-input placeholder="受检物号" size="mini" v-model="form.checkout_number" />
+                </el-form-item>
+                <el-form-item label="内部反馈人" prop="interior_feedback_name" style="width:20%">
+                    <el-input placeholder="内部反馈人" size="mini" v-model="form.interior_feedback_name" />
+                </el-form-item>
+                <el-form-item label="内部反馈单位" prop="interior_feedback_unit" style="width:20%">
+                    <el-input placeholder="内部反馈单位" size="mini" v-model="form.interior_feedback_unit" />
+                </el-form-item>
+                <el-form-item label="负责人" prop="principal_name" style="width:20%">
+                    <el-input placeholder="负责人" size="mini" v-model="form.principal_name" />
+                </el-form-item>
+                <el-form-item label="客服订单" prop="complaint_order" style="width:20%">
+                    <el-input placeholder="客服订单" v-model="form.complaint_order" />
+                </el-form-item>
+                <el-form-item label="成本" prop="cost" style="width:20%">
+                    <el-input placeholder="成本" v-model.number="form.cost" />
+                </el-form-item>
+                <el-form-item label="问题分级" prop="issue_level" style="width:20%">
+                    <el-select v-model="form.issue_level" placeholder="问题分级" style="width:100%">
                         <el-option v-for="item in methodOptions" :key="item.value"
                             :label="`${item.label}(${item.value})`" :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型" prop="method" style="width:20%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="类别" prop="method" style="width:20%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="处理方式" prop="method" style="width:30%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="项目" prop="method" style="width:30%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="受检物名称" prop="path" style="width:30%">
-                    <el-input placeholder="受检物名称" size="mini" />
-                </el-form-item>
-                <el-form-item label="受检物号" prop="path" style="width:30%">
-                    <el-input placeholder="受检物号" size="mini" />
-                </el-form-item>
-                <el-form-item label="图纸号" prop="path" style="width:30%">
-                    <el-input placeholder="图纸号" size="mini" />
-                </el-form-item>
-                <el-form-item label="版本号" prop="path" style="width:30%">
-                    <el-input placeholder="版本号" size="mini" />
-                </el-form-item>
-                <el-form-item label="采购订单号" prop="path" style="width:30%">
-                    <el-input placeholder="采购订单号" size="mini" />
-                </el-form-item>
-                <el-form-item label="生产订单号" prop="path" style="width:30%">
-                    <el-input placeholder="生产订单号" size="mini" />
-                </el-form-item>
-                <el-form-item label="发货单号" prop="path" style="width:30%">
-                    <el-input placeholder="发货单号" size="mini" />
-                </el-form-item>
-                <el-form-item label="收货数量" prop="path" style="width:30%">
-                    <el-input placeholder="收货数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="货物拒收数量" prop="path" style="width:30%">
-                    <el-input placeholder="货物拒收数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="样品检验数量" prop="path" style="width:30%">
-                    <el-input placeholder="样品检验数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="样品拒收数量" prop="path" style="width:30%">
-                    <el-input placeholder="样品拒收数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="供应商" prop="method" style="width:30%">
-                    <el-select v-model="form.method" placeholder="供应商" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="检验日期" prop="method" style="width:30%">
-                    <el-date-picker v-model="value" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-                        :default-time="['00:00:00', '23:59:59']">
+                <el-form-item label="短期措施/计划完成时间" prop="short_plan_date" style="width:30%">
+                    <el-date-picker v-model="form.short_plan_date" type="date" placeholder="计划完成时间"
+                        value-format="YYYY-MM-DDT15:04:05Z">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="不合格描述" prop="method" style="width:80%">
-                    <el-input type="textarea" placeholder="请输入内容" v-model="textarea" maxlength="50" show-word-limit
-                        :rows="10" />
+                <el-form-item label="整改计划完成时间" prop="rectify_date" style="width:30%">
+                    <el-date-picker v-model="form.rectify_date" type="date" placeholder="整改计划完成时间"
+                        value-format="YYYY-MM-DDT15:04:05Z">
+                    </el-date-picker>
                 </el-form-item>
-                <el-form-item label="图片上传" prop="method" style="width:100%">
-                    <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                        :on-change="handleChange" :file-list="fileList">
-                        <el-button size="small" type="primary">点击上传</el-button>
-                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-                    </el-upload>
+                <el-form-item label="提交时间" prop="submit_date" style="width:30%">
+                    <el-date-picker v-model="form.submit_date" type="date" placeholder="整改计划完成时间"
+                        value-format="YYYY-MM-DDT15:04:05Z">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="关闭时间" prop="close_date" style="width:30%">
+                    <el-date-picker v-model="form.close_date" type="date" placeholder="关闭时间"
+                        value-format="YYYY-MM-DDT15:04:05Z">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="问题描述（5W2H）附件照片" prop="issue_desc" style="width:80%">
+                    <el-input placeholder="问题描述（5W2H）附件照片" size="mini" type="textarea" v-model="form.issue_desc"
+                        maxlength="50" show-word-limit :rows="10" />
+                </el-form-item>
+                <el-form-item label="整改措施" prop="rectify" style="width:80%">
+                    <el-input placeholder="整改措施" size="mini" type="textarea" v-model="form.rectify" maxlength="50"
+                        show-word-limit :rows="10" />
+                </el-form-item>
+                <el-form-item label="原因分析/附件/描述" prop="cause_desc" style="width:100%">
+                    <el-input placeholder="问题描述（5W2H）附件照片" size="mini" type="textarea" v-model="form.cause_desc"
+                        maxlength="50" show-word-limit :rows="10" />
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -201,20 +185,16 @@
 
 <script setup>
 import {
-    getApiById,
-    getApiList,
-    createApi,
-    updateApi,
-    deleteApi,
-    deleteApisByIds,
-    freshCasbin
-} from '@/api/api'
-import { toSQLLine } from '@/utils/stringFun'
-import WarningBar from '@/components/warningBar/warningBar.vue'
+    deleteComplaint,
+    updateComplaint,
+    getComplaintById,
+    createComplaint,
+    getComplaintlist,
+    setPassDate
+} from '@/api/complaint.js'
+import { toSQLLine, formatDate } from '@/utils/stringFun'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { VideoCameraFilled } from '@element-plus/icons-vue'
-import { toDoc } from '@/utils/doc'
 
 defineOptions({
     name: 'Api',
@@ -227,10 +207,26 @@ const methodFilter = (value) => {
 
 const apis = ref([])
 const form = ref({
-    path: '',
-    apiGroup: '',
-    method: '',
-    description: ''
+    product_name: "",
+    product_sequence: "",
+    client_name: "",
+    complaint_name: "",
+    project_name: "",
+    status: "",
+    checkout_number: "",
+    interior_feedback_name: "",
+    interior_feedback_unit: "",
+    issue_desc: "",
+    issue_level: "",
+    short_plan_date: "",
+    cause_desc: "",
+    complaint_order: "",
+    principal_name: "",
+    cost: "",
+    rectify_date: "",
+    submit_date: "",
+    close_date: "",
+    rectify: ""
 })
 const methodOptions = ref([
     {
@@ -311,7 +307,7 @@ const sortChange = ({ prop, order }) => {
 
 // 查询
 const getTableData = async () => {
-    const table = await getApiList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getComplaintlist({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -360,22 +356,38 @@ const apiForm = ref(null)
 const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
-        path: '',
-        apiGroup: '',
-        method: '',
-        description: ''
+        product_name: "",
+        product_sequence: "",
+        client_name: "",
+        complaint_name: "",
+        project_name: "",
+        status: "",
+        checkout_number: "",
+        interior_feedback_name: "",
+        interior_feedback_unit: "",
+        issue_desc: "",
+        issue_level: "",
+        short_plan_date: "",
+        cause_desc: "",
+        complaint_order: "",
+        principal_name: "",
+        cost: "",
+        rectify_date: "",
+        submit_date: "",
+        close_date: "",
+        rectify: ""
     }
 }
 
-const dialogTitle = ref('添加不合格品')
+const dialogTitle = ref('添加客诉')
 const dialogFormVisible = ref(false)
 const openDialog = (key) => {
     switch (key) {
         case 'addApi':
-            dialogTitle.value = '添加不合格品'
+            dialogTitle.value = '添加客诉'
             break
         case 'edit':
-            dialogTitle.value = '编辑Api'
+            dialogTitle.value = '编辑客诉'
             break
         default:
             break
@@ -389,8 +401,8 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-    const res = await getApiById({ id: row.ID })
-    form.value = res.data.api
+    const res = await getComplaintById({ id: row.ID })
+    form.value = res.data.compliant
     openDialog('edit')
 }
 
@@ -400,7 +412,7 @@ const enterDialog = async () => {
             switch (type.value) {
                 case 'addApi':
                     {
-                        const res = await createApi(form.value)
+                        const res = await createComplaint(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -415,7 +427,7 @@ const enterDialog = async () => {
                     break
                 case 'edit':
                     {
-                        const res = await updateApi(form.value)
+                        const res = await updateComplaint(form.value)
                         if (res.code === 0) {
                             ElMessage({
                                 type: 'success',
@@ -449,7 +461,7 @@ const deleteApiFunc = async (row) => {
         type: 'warning'
     })
         .then(async () => {
-            const res = await deleteApi(row)
+            const res = await deleteComplaint(row)
             if (res.code === 0) {
                 ElMessage({
                     type: 'success',

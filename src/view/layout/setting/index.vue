@@ -1,30 +1,14 @@
 <template>
   <div>
-    <el-button
-      type="primary"
-      class="drawer-container"
-      icon="setting"
-      @click="showSettingDrawer"
-    />
-    <el-drawer
-      v-model="drawer"
-      title="系统配置"
-      :direction="direction"
-      :before-close="handleClose"
-    >
+    <el-button type="primary" class="drawer-container" icon="setting" @click="showSettingDrawer" />
+    <el-drawer v-model="drawer" title="系统配置" :direction="direction" :before-close="handleClose">
       <div class="setting_body">
         <div class="setting_card">
           <div class="setting_content">
             <div class="theme-box">
-              <div
-                class="item"
-                @click="changeMode('light')"
-              >
+              <div class="item" @click="changeMode('light')">
                 <div class="item-top">
-                  <el-icon
-                    v-if="userStore.mode === 'light'"
-                    class="check"
-                  >
+                  <el-icon v-if="userStore.mode === 'light'" class="check">
                     <check />
                   </el-icon>
                   <img src="https://gw.alipayobjects.com/zos/antfincdn/NQ%24zoisaD2/jpRkZQMyYRryryPNtyIC.svg">
@@ -33,15 +17,9 @@
                   简约白
                 </p>
               </div>
-              <div
-                class="item"
-                @click="changeMode('dark')"
-              >
+              <div class="item" @click="changeMode('dark')">
                 <div class="item-top">
-                  <el-icon
-                    v-if="userStore.mode === 'dark'"
-                    class="check"
-                  >
+                  <el-icon v-if="userStore.mode === 'dark'" class="check">
                     <check />
                   </el-icon>
                   <img src="https://gw.alipayobjects.com/zos/antfincdn/XwFOFbLkSM/LCkqqYNmvBEbokSDscrm.svg">
@@ -91,9 +69,11 @@ const changeMode = (e) => {
 <style lang="scss" scoped>
 .drawer-container {
   transition: all 0.2s;
-  &:hover{
+
+  &:hover {
     right: 0
   }
+
   position: fixed;
   right: -20px;
   bottom: 15%;
@@ -106,48 +86,56 @@ const changeMode = (e) => {
   color: #fff;
   border-radius: 4px 0 0 4px;
   cursor: pointer;
-  -webkit-box-shadow: inset 0 0 6px rgba(0 ,0 ,0, 10%);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 10%);
 }
-.setting_body{
+
+.setting_body {
   padding: 20px;
-  .setting_card{
+
+  .setting_card {
     margin-bottom: 20px;
   }
-  .setting_content{
+
+  .setting_content {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
-    >.theme-box{
-     display: flex;
+
+    >.theme-box {
+      display: flex;
     }
-    >.color-box{
-      div{
+
+    >.color-box {
+      div {
         display: flex;
         flex-direction: column;
       }
     }
-    .item{
+
+    .item {
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       margin-right: 20px;
-      .item-top{
+
+      .item-top {
         position: relative;
       }
-      .check{
+
+      .check {
         position: absolute;
         font-size: 20px;
         color: #00afff;
-        right:10px;
+        right: 10px;
         bottom: 10px;
       }
-      p{
+
+      p {
         text-align: center;
         font-size: 12px;
       }
     }
   }
 }
-
 </style>

@@ -2,11 +2,11 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="所属国家">
-                    <el-input v-model="searchInfo.country" placeholder="所属国家" />
+                <el-form-item label="产品名称">
+                    <el-input v-model="searchInfo.product" placeholder="产品名称" />
                 </el-form-item>
-                <el-form-item label="供应商类型">
-                    <el-input v-model="searchInfo.genre" placeholder="供应商类型" />
+                <el-form-item label="供应商地址">
+                    <el-input v-model="searchInfo.addr" placeholder="供应商地址" />
                 </el-form-item>
                 <el-form-item label="供应商名称">
                     <el-input v-model="searchInfo.name" placeholder="供应商类型" />
@@ -23,10 +23,12 @@
             </div>
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
-                <el-table-column align="left" label="所属国家" min-width="150" prop="country" sortable="custom" />
-                <el-table-column align="left" label="供应商类型" min-width="150" prop="genre" sortable="custom" />
-                <el-table-column align="left" label="供应商名称" min-width="150" prop="name" sortable="custom">
-                </el-table-column>
+                <el-table-column align="left" label="供应商名称" min-width="150" prop="name" sortable="custom" />
+                <el-table-column align="left" label="供应商地址" min-width="150" prop="addr" sortable="custom" />
+                <el-table-column align="left" label="供货产品名称" min-width="150" prop="product" sortable="custom" />
+                <el-table-column align="left" label="联系人" min-width="150" prop="contacts" sortable="custom" />
+                <el-table-column align="left" label="联系电话" min-width="150" prop="phone" sortable="custom" />
+                <el-table-column align="left" label="Email" min-width="150" prop="email" sortable="custom" />
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
                         <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row)">修改</el-button>
@@ -44,14 +46,23 @@
 
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="30%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="所属国家" prop="country" style="width:100%">
-                    <el-input placeholder="所属国家" autocomplete="off" v-model="form.country" />
-                </el-form-item>
-                <el-form-item label="供应商类型" prop="genre" style="width:100%">
-                    <el-input placeholder="供应商类型" autocomplete="off" v-model="form.genre" />
-                </el-form-item>
                 <el-form-item label="供应商名称" prop="name" style="width:100%">
                     <el-input placeholder="供应商名称" autocomplete="off" v-model="form.name" />
+                </el-form-item>
+                <el-form-item label="供应商地址" prop="addr" style="width:100%">
+                    <el-input placeholder="供应商地址" autocomplete="off" v-model="form.addr" />
+                </el-form-item>
+                <el-form-item label="供货产品名称" prop="product" style="width:100%">
+                    <el-input placeholder="供货产品名称" autocomplete="off" v-model="form.product" />
+                </el-form-item>
+                <el-form-item label="联系人" prop="contacts" style="width:100%">
+                    <el-input placeholder="联系人" autocomplete="off" v-model="form.contacts" />
+                </el-form-item>
+                <el-form-item label="联系电话" prop="phone" style="width:100%">
+                    <el-input placeholder="联系电话" autocomplete="off" v-model="form.phone" />
+                </el-form-item>
+                <el-form-item label="Email" prop="email" style="width:100%">
+                    <el-input placeholder="Email" autocomplete="off" v-model="form.email" />
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -91,9 +102,12 @@ const methodFilter = (value) => {
 
 const apis = ref([])
 const form = ref({
-    country: '',
-    genre: '',
-    name: ''
+    name: '',
+    addr: '',
+    email: '',
+    phone: '',
+    product: '',
+    contacts: ''
 })
 const methodOptions = ref([
     {
@@ -220,9 +234,12 @@ const apiForm = ref(null)
 const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
-        country: '',
-        genre: '',
-        name: ''
+        name: '',
+        addr: '',
+        email: '',
+        phone: '',
+        product: '',
+        contacts: ''
     }
 }
 

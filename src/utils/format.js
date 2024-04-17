@@ -51,3 +51,8 @@ export const ReturnArrImg = (arr) => {
 export const onDownloadFile = (url) => {
   window.open(path + url)
 }
+
+
+export const strToJson = (s,t) => {
+  return s == "" ? t : JSON.parse(s)
+}

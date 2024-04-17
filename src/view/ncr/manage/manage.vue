@@ -2,43 +2,43 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门" style="width:15%" prop="method">
-                    <el-select v-model="searchInfo.apiGroup" placeholder="选择部门">
+                <el-form-item label="部门" style="width:10%" prop="method">
+                    <el-select v-model="searchInfo.department" placeholder="选择部门">
                         <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
                             :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型" style="width:15%" prop="method">
-                    <el-select v-model="searchInfo.apiGroup" placeholder="请选择">
-                        <el-option v-for="item in mold" :key="item.value" :label="item.label" :value="item.value">
+                <el-form-item label="类型" style="width:10%" prop="method">
+                    <el-select v-model="searchInfo.mold" placeholder="请选择">
+                        <el-option v-for="item in moldList" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别" prop="method" style="width:16%">
-                    <el-select v-model="searchInfo.apiGroup" placeholder="请选择">
+                <el-form-item label="类别" prop="method" style="width:10%">
+                    <el-select v-model="searchInfo.category" placeholder="请选择">
                         <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称" prop="method" style="width:20%">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="受检物名称" />
+                <el-form-item label="受检物名称" prop="method" style="width:10%">
+                    <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
-                <el-form-item label="受检物号" prop="method" style="width:20%">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="受检物号" />
+                <el-form-item label="受检物号" prop="method" style="width:10%">
+                    <el-input v-model="searchInfo.checkout_name" placeholder="受检物号" />
                 </el-form-item>
-                <el-form-item label="处理方式" prop="method" style="width:15%">
-                    <el-select v-model="value" placeholder="请选择">
+                <el-form-item label="处理方式" prop="method" style="width:10%">
+                    <el-select v-model="searchInfo.process_mode" placeholder="请选择">
                         <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
                             :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="项目名称" prop="method" style="width:20%">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="项目名称" />
+                <el-form-item label="项目名称" prop="project" style="width:10%">
+                    <el-input v-model="searchInfo.project" placeholder="项目名称" />
                 </el-form-item>
-                <el-form-item label="填表日期" prop="method" style="width:30%">
-                    <el-date-picker v-model="searchInfo.checkout_date" type="date" placeholder="选择日期"
+                <el-form-item label="填表日期" prop="checkout_date" style="width:10%">
+                    <el-date-picker v-model="searchInfo.created_at" type="date" placeholder="选择日期"
                         value-format="YYYY-MM-DDT15:04:05Z">
                     </el-date-picker>
                 </el-form-item>
@@ -63,9 +63,17 @@
                 <el-table-column align="left" label="受检物号" min-width="150" prop="checkout_number" sortable="custom" />
                 <el-table-column align="left" label="处理方式" min-width="150" prop="process_mode" sortable="custom" />
                 <el-table-column align="left" label="责任部门" min-width="150" prop="duty_department" sortable="custom" />
-                <el-table-column align="left" label="检验日期" min-width="150" prop="checkout_date" sortable="custom"
-                    :formatter="formatData" />
-                <el-table-column align="left" label="填表日期" min-width="150" prop="fill_from_date" sortable="custom">
+                <el-table-column align="left" label="检验日期" min-width="150" prop="checkout_date" sortable="custom">
+                    <template #default="scope">
+                        <i class="el-icon-time"></i>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.checkout_date) }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column align="left" label="填表日期" min-width="150" prop="created_at" sortable="custom">
+                    <template #default="scope">
+                        <i class="el-icon-time"></i>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.created_at) }}</span>
+                    </template>
                 </el-table-column>
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
@@ -85,18 +93,18 @@
                                 :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '2'">返修</el-button>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
-                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '3')">
-                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'pass')"
-                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '3'">让步接收</el-button>
-                        </el-tooltip>
-                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
                             :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '4')">
-                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'parts')"
-                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '4'">配做</el-button>
+                            <el-button icon="position" type="primary" link @click="setPassDateFunc(scope.row, '4')"
+                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '4'">让步接收</el-button>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
-                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '5')" >
-                            <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'die')"
+                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '3')">
+                            <el-button icon="ticket" type="primary" link @click="editApiFunc(scope.row, 'parts')"
+                                :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '3'">配做</el-button>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
+                            :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '5')">
+                            <el-button icon="remove" type="primary" link @click="editApiFunc(scope.row, 'die')"
                                 :disabled="scope.row.operation_type != '' && scope.row.operation_type !== '5'">报废</el-button>
                         </el-tooltip>
                         <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
@@ -113,7 +121,7 @@
 
         </div>
 
-        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="60%">
+        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="80%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
                 <el-form-item label="编号:" prop="serialnumber" style="width:20%">
                     <p v-show="isNcr">{{ form.serialnumber }}</p>
@@ -232,7 +240,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="检验日期:" prop="checkout_date" style="width:23%">
-                    <span v-show="isNcr">{{ form.checkout_date }}</span>
+                    <span v-show="isNcr">{{ formatDate(form.checkout_date) }}</span>
 
                     <el-date-picker v-model="form.checkout_date" type="date" placeholder="选择日期"
                         value-format="YYYY-MM-DDT15:04:05Z" v-if="isNcrDisabled">
@@ -247,7 +255,7 @@
                 <el-form-item label="NCR图片:" prop="photograph" style="width:100%">
                     <el-image v-show="isNcr" v-for="item in imgList"
                         style="width: 100px; height: 100px;display: block;margin: 5px;box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);"
-                        :src="path + item.url">
+                        :src="path + item.url" :preview-src-list="[path + item.url]">
                     </el-image>
                     <el-upload action="/api/fileUploadAndDownload/upload" multiple :limit="2" :file-list="fileList"
                         :on-success="handleSuccess" show-file-list="false" :on-remove="handleRemove"
@@ -314,7 +322,38 @@
                         <el-input type="textarea" placeholder="请输入内容" v-model="form.parts_desc" maxlength="50"
                             show-word-limit :rows="10" />
                     </el-form-item>
-                    <el-form-item label="配做系列" prop="series" style="width:100%">
+                    <el-form-item prop="series" label="配做订单">
+                        <el-table :data="tablePartsData" border style="width: 100%;" :stripe="true">
+                            <el-table-column label="产品系列号" align="center" min-width="150" prop="product_serialnumber">
+                                <template #default="scope">
+                                    <el-input v-model="scope.row.product_serialnumber"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="产品名称" align="center" min-width="150" prop="product_name">
+                                <template #default="scope">
+                                    <el-input v-model="scope.row.product_name"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="物料系列号" min-width="150" prop="w_serialnumber">
+                                <template #default="scope">
+                                    <el-input v-model="scope.row.w_serialnumber"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="物料名称" align="center" min-width="150" prop="w_name">
+                                <template #default="scope">
+                                    <el-input v-model="scope.row.w_name"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" min-width="50" prop="action" align="center">
+                                <template #default="scope">
+                                    <el-button @click="deleteTableData(scope.row)" link icon="Delete"
+                                        type="primary"></el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-icon @click="addTableData" class="icon" size="24" color="#fb7a14">
+                            <CirclePlusFilled />
+                        </el-icon>
                     </el-form-item>
                 </div>
             </el-form>
@@ -338,12 +377,12 @@ import {
     updateManage,
     getManageById,
     createManage,
-    getManageList
+    getManageList,
+    setPassDate
 } from '@/api/manage.js'
-import { toSQLLine } from '@/utils/stringFun'
+import { toSQLLine, formatDate } from '@/utils/stringFun'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-
 defineOptions({
     name: 'Api',
 })
@@ -409,8 +448,29 @@ const form = ref({
     repair_attachment: "",
     parts_desc: "",
     series: "",
-    operation_type: ""
+    operation_type: "",
+    pass_date: "0001-01-01T00:00:00Z"
 })
+
+const tablePartsData = ref([])
+
+const addTableData = () => {
+    const newRow = {
+        product_serialnumber: null,
+        product_name: null,
+        w_serialnumber: null,
+        w_name: null
+    }
+    tablePartsData.value.push(newRow)
+}
+// 删除
+const deleteTableData = (row) => {
+    const index = tablePartsData.value.indexOf(row);
+    if (index !== -1) {
+        tablePartsData.value.splice(index, 1);
+    }
+}
+
 const methodOptions = ref([
     {
         value: 'Just Do it',
@@ -469,9 +529,25 @@ const searchInfo = ref({})
 const onReset = () => {
     searchInfo.value = {}
 }
+
 const handleSuccess = (resp) => {
-    fileList.value.push({ name: resp.data.file.name, url: resp.data.file.url })
-    form.value.photograph = JSON.stringify(fileList.value)
+    if (resp.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: '图片上传成功',
+            showClose: true
+        })
+
+        fileList.value.push({ name: resp.data.file.name, url: resp.data.file.url })
+        form.value.photograph = JSON.stringify(fileList.value)
+        return
+    }
+    ElMessage({
+        type: 'error',
+        message: '图片上传失败',
+        showClose: true
+    })
+
 };
 
 const handleRemove = (file, fileList) => {
@@ -485,11 +561,26 @@ const handleRemove = (file, fileList) => {
 
 //返工图片处理
 const handleSuccess1 = (resp) => {
-    fileList1.value.push({ name: resp.data.file.name, url: resp.data.file.url })
-    form.value.rework_attachment = JSON.stringify(fileList1.value)
+    if (resp.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: '图片上传成功',
+            showClose: true
+        })
+
+        fileList1.value.push({ name: resp.data.file.name, url: resp.data.file.url })
+        form.value.photograph = JSON.stringify(fileList1.value)
+        return
+    }
+    ElMessage({
+        type: 'error',
+        message: '图片上传失败',
+        showClose: true
+    })
+
 };
 
-const handleRemove1 = (file, fileList) => {
+const handleRemove1 = (file, fileList1) => {
     // 处理删除文件的逻辑，例如从文件列表中删除文件
     const index = fileList1.indexOf(file);
     if (index !== -1) {
@@ -499,11 +590,25 @@ const handleRemove1 = (file, fileList) => {
 };
 //返修图片处理
 const handleSuccess2 = (resp) => {
-    fileList2.value.push({ name: resp.data.file.name, url: resp.data.file.url })
-    form.value.repair_attachment = JSON.stringify(fileList2.value)
+    if (resp.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: '图片上传成功',
+            showClose: true
+        })
+
+        fileList2.value.push({ name: resp.data.file.name, url: resp.data.file.url })
+        form.value.photograph = JSON.stringify(fileList2.value)
+        return
+    }
+    ElMessage({
+        type: 'error',
+        message: '图片上传失败',
+        showClose: true
+    })
 };
 
-const handleRemove2 = (file, fileList) => {
+const handleRemove2 = (file, fileList2) => {
     // 处理删除文件的逻辑，例如从文件列表中删除文件
     const index = fileList2.indexOf(file);
     if (index !== -1) {
@@ -720,6 +825,7 @@ const closeDialog = () => {
     fileList.value = []
     fileList1.value = []
     fileList2.value = []
+    tablePartsData.value = []
     isNcrDisabled.value = true
     isNcr.value = false
     isRework.value = false
@@ -731,8 +837,6 @@ const closeDialog = () => {
 const imgList = ref()
 
 const editApiFunc = async (row, operation) => {
-
-    console.log(row.operation_type)
     const res = await getManageById({ id: row.ID })
     form.value = res.data.manage
     if (form.value.photograph !== '') {
@@ -743,14 +847,36 @@ const editApiFunc = async (row, operation) => {
     if (form.value.rework_attachment !== '') {
         fileList1.value = JSON.parse(form.value.rework_attachment)
     }
-    // if (form.value.repair_attachment !== '') {
-    //     fileList2.value = JSON.parse(form.value.repair_attachment)
-    // }
+    if (form.value.repair_attachment !== '') {
+        fileList2.value = JSON.parse(form.value.repair_attachment)
+    }
+
+    if (form.value.series !== '') {
+        tablePartsData.value = JSON.parse(form.value.series)
+    }
     openDialog(operation)
 
 }
+
+
+const setPassDateFunc = async (row, ot) => {
+    const res = await setPassDate({ id: row.ID, operation_type: ot })
+    if (res.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: '放行更新成功',
+            showClose: true
+        })
+    }
+    getTableData()
+}
+
+
 const enterDialog = async () => {
     apiForm.value.validate(async valid => {
+        if (tablePartsData.value !== null) {
+            form.value.series = JSON.stringify(tablePartsData.value)
+        }
         if (valid) {
             switch (type.value) {
                 case 'addApi':
@@ -825,5 +951,16 @@ const deleteApiFunc = async (row) => {
 <style scoped lang="scss">
 .warning {
     color: #dc143c;
+}
+</style>
+<style lang='scss' scoped>
+.box {
+    position: relative;
+
+    .icon {
+        position: absolute;
+        bottom: 10px;
+        right: 19px;
+    }
 }
 </style>

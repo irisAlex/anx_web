@@ -2,33 +2,33 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门" style="width:15%">
-                    <el-select v-model="value" placeholder="北京安新">
-                        <el-option v-for="item in departmentList" :key="item.value" :label="item.label"
-                            :value="item.value">
+                <el-form-item label="部门" style="width:10%">
+                    <el-select v-model="searchInfo.department" placeholder="北京安新">
+                        <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
+                            :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型" style="width:15%">
-                    <el-select v-model="value" placeholder="请选择">
+                <el-form-item label="类型" style="width:10%">
+                    <el-select v-model="searchInfo.mold" placeholder="请选择">
                         <el-option v-for="item in moldList" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别" style="width:15%">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in genreList1" :key="item.value" :label="item.label" :value="item.value">
+                <el-form-item label="类别" style="width:10%">
+                    <el-select v-model="searchInfo.category" placeholder="请选择">
+                        <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称" style="width:15%">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="受检物名称" />
+                <el-form-item label="受检物名称" style="width:10%">
+                    <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
-                <el-form-item label="受检物号" style="width:15%">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="受检物号" />
+                <el-form-item label="受检物号" style="width:10%">
+                    <el-input v-model="searchInfo.checkout_number" placeholder="受检物号" />
                 </el-form-item>
-                <el-form-item label="处理方式" style="width:15%">
-                    <el-select v-model="value" placeholder="请选择">
+                <el-form-item label="处理方式" style="width:10%">
+                    <el-select v-model="searchInfo.process_mode" placeholder="请选择">
                         <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
                             :value="item.value">
                         </el-option>
@@ -54,21 +54,43 @@
             <el-table-column align="left" label="项目" min-width="150" prop="project" sortable="custom" />
             <el-table-column align="left" label="受检物名称" min-width="150" prop="checkout_name" sortable="custom" />
             <el-table-column align="left" label="受检物号" min-width="150" prop="checkout_number" sortable="custom" />
-            <el-table-column align="left" label="状态" min-width="150" prop="description" sortable="custom" />
+            <el-table-column align="left" label="处理方式" min-width="150" prop="process_mode" sortable="custom" />
+            <el-table-column align="left" label="状态" min-width="150" prop="description" sortable="custom">
+                <template #default="scope">
+                    <div slot="reference" class="name-wrapper">
+                        <el-tag
+                            :type="scope.row.status === '1' ? 'success' : scope.row.status === '-1' ? 'danger' : 'info'"
+                            disable-transitions>{{
+                                scope.row.status === '1' ? '同意' : scope.row.status === '-1' ? '拒绝' : '待审批'
+                            }}</el-tag>
+                    </div>
+                </template>
+            </el-table-column>
             <el-table-column align="left" label="数量" min-width="150" prop="rework_number" sortable="custom" />
             <el-table-column align="left" label="工时" min-width="150" prop="rework_man_hour" sortable="custom" />
             <el-table-column align="left" label="工料" min-width="150" prop="rework_quantities" sortable="custom" />
             <el-table-column align="left" label="工序" min-width="150" prop="rework_process" sortable="custom" />
-            <el-table-column align="left" label="计划时间" min-width="150" prop="rework_plan_date" sortable="custom" />
-            <el-table-column align="left" label="照片" min-width="150" prop="rework_process" sortable="custom">
+            <el-table-column align="left" label="计划时间" min-width="150" sortable="custom">
+                <template #default="scope">
+                    <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ formatDate(scope.row.rework_plan_date) }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column align="left" label="照片" min-width="200" prop="rework_attachment" sortable="custom">
+                <template #default="scope">
+                    <el-image v-for="item in (JSON.parse(scope.row.rework_attachment))"
+                        style="width: 100px; height: 100px;display: block;margin: 5px;box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);"
+                        :src="path + item.url" :preview-src-list="[path + item.url]" :preview-teleported="true"
+                        fit="fill">
+                    </el-image>
+                </template>
             </el-table-column>
             <el-table-column align="left" fixed="right" label="操作" width="300">
                 <template #default="scope">
-                    <el-button icon="check" type="primary" link @click="editApiFunc(scope.row)">同意</el-button>
-                    <el-button icon="remove" type="primary" link @click="deleteApiFunc(scope.row)">拒绝</el-button>
+                    <el-button icon="check" type="primary" link @click="setApiFunc(scope.row, '1')">同意</el-button>
+                    <el-button icon="remove" type="primary" link @click="setApiFunc(scope.row, '-1')">拒绝</el-button>
                     <el-button icon="view" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
-                    <el-button icon="printer" type="primary" link @click="editApiFunc(scope.row)">打印</el-button>
-                    <el-button icon="circle-close" type="primary" link @click="editApiFunc(scope.row)">关闭</el-button>
+                    <el-button icon="printer" type="primary" link @click="">打印</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -77,7 +99,100 @@
                 layout="total, sizes, prev, pager, next, jumper" @current-change="handleCurrentChange"
                 @size-change="handleSizeChange" />
         </div>
+        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="40%">
+            <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
+                <el-form-item label="编号" prop="method" style="width:30%">
+                    <span>
+                        {{ form.serialnumber }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="受检物名称" prop="checkout_name" style="width:30%">
+                    <span>{{ form.checkout_name }}</span>
+                </el-form-item>
+                <el-form-item label="受检物号" prop="checkout_number" style="width:30%">
+                    <span>
+                        {{ form.checkout_number }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="类别" prop="category" style="width:30%">
+                    <span>
+                        {{ form.category }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="部门" prop="department" style="width:30%">
+                    <span>
+                        {{ form.department }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="项目" prop="project" style="width:30%">
+                    <span>
+                        {{ form.project }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="数量" prop="rework_number" style="width:30%">
+                    <span>
+                        {{ form.rework_number }}
+                    </span>
+                </el-form-item>
 
+                <el-form-item label="工时" prop="rework_man_hour" style="width:30%">
+                    <span>
+                        {{ form.rework_man_hour }}
+                    </span>
+                </el-form-item>
+
+                <el-form-item label="工料" prop="rework_man_hour" style="width:30%">
+                    <span>
+                        {{ form.rework_quantities }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="工序" prop="rework_man_hour" style="width:30%">
+                    <span>
+                        {{ form.rework_process }}
+                    </span>
+                </el-form-item>
+
+
+                <el-form-item label="处理方式" prop="process_mode" style="width:30%">
+                    <span>
+                        {{ form.process_mode }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="类型" prop="category" style="width:30%">
+                    <span>
+                        {{ form.mold }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="状态" prop="status" style="width:30%">
+                    <template #default="scope">
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag :type="form.status === '1' ? 'success' : form.status === '-1' ? 'danger' : 'info'"
+                                disable-transitions>{{
+                                    form.status === '1' ? '同意' : form.status === '-1' ? '拒绝' : '待处理'
+                                }}</el-tag>
+                        </div>
+                    </template>
+                </el-form-item>
+                <el-form-item label="计划时间" prop="rework_plan_date" style="width:30%">
+                    <span>
+                        {{ formatDate(form.rework_plan_date) }}
+                    </span>
+                </el-form-item>
+                <el-form-item label="照片" prop="rework_attachment" style="width:30%">
+                    <el-image v-for="item in imgList"
+                        style="width: 100px; height: 100px;display: block;margin: 5px;box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);"
+                        :src="path + item.url" :preview-src-list="[path + item.url]">
+                    </el-image>
+                </el-form-item>
+
+            </el-form>
+            <!-- <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="closeDialog" v-if="isFormDisabled">取 消</el-button>
+                    <el-button type="primary" @click="enterDialog" v-if="isFormDisabled">确 定</el-button>
+                </div>
+            </template> -->
+        </el-dialog>
     </div>
 
 </template>
@@ -88,18 +203,14 @@ import {
     getGenreList,
     getSupplierList,
     getProjectList,
-    deleteManage,
-    updateManage,
+    setStatus,
+    getManageList,
     getManageById,
-    createManage,
-    getManageList
 } from '@/api/manage.js'
-import { toSQLLine } from '@/utils/stringFun'
-import WarningBar from '@/components/warningBar/warningBar.vue'
+
+import { toSQLLine, formatDate } from '@/utils/stringFun'
 import { ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { VideoCameraFilled } from '@element-plus/icons-vue'
-import { toDoc } from '@/utils/doc'
+import { ElMessage } from 'element-plus'
 
 defineOptions({
     name: 'Api',
@@ -110,9 +221,11 @@ const methodFilter = (value) => {
     return target && `${target.label}`
 }
 
+const path = import.meta.env.VITE_BASE_PATH + ':' + import.meta.env.VITE_SERVER_PORT + '/'
 const apis = ref([])
 const form = ref({
     serialnumber: "",
+    process_mode: "",
     department: "",
     mold: "",
     category: "",
@@ -125,7 +238,8 @@ const form = ref({
     rework_process: "",
     rework_plan_date: "0001-01-01T00:00:00Z",
     rework_desc: "",
-    rework_attachment: ""
+    rework_attachment: "",
+    is_ncr: ''
 })
 const methodOptions = ref([
     {
@@ -262,7 +376,7 @@ const project = async () => {
 project()
 
 
-const operation = ref("1")
+const operation = ref("返工")
 // 查询
 const getTableData = async () => {
     const table = await getManageList({ page: page.value, pageSize: pageSize.value, keyword: operation.value, ...searchInfo.value })
@@ -281,33 +395,6 @@ const handleSelectionChange = (val) => {
     apis.value = val
 }
 
-const deleteVisible = ref(false)
-const onDelete = async () => {
-    const ids = apis.value.map(item => item.ID)
-    const res = await deleteApisByIds({ ids })
-    if (res.code === 0) {
-        ElMessage({
-            type: 'success',
-            message: res.msg
-        })
-        if (tableData.value.length === ids.length && page.value > 1) {
-            page.value--
-        }
-        deleteVisible.value = false
-        getTableData()
-    }
-}
-const freshVisible = ref(false)
-const onFresh = async () => {
-    const res = await freshCasbin()
-    if (res.code === 0) {
-        ElMessage({
-            type: 'success',
-            message: res.msg
-        })
-    }
-    freshVisible.value = false
-}
 
 // 弹窗相关
 const apiForm = ref(null)
@@ -315,6 +402,7 @@ const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
         serialnumber: "",
+        process_mode: "",
         department: "",
         mold: "",
         category: "",
@@ -327,18 +415,16 @@ const initForm = () => {
         rework_process: "",
         rework_plan_date: "0001-01-01T00:00:00Z",
         rework_desc: "",
-        rework_attachment: ""
+        rework_attachment: "",
+        is_ncr: ''
     }
 }
-const dialogTitle = ref('添加不合格品')
+const dialogTitle = ref('查看返工')
 const dialogFormVisible = ref(false)
 const openDialog = (key) => {
     switch (key) {
-        case 'addApi':
-            dialogTitle.value = '添加不合格品'
-            break
-        case 'edit':
-            dialogTitle.value = '编辑Api'
+        case 'look':
+            dialogTitle.value = '查看返工'
             break
         default:
             break
@@ -351,79 +437,26 @@ const closeDialog = () => {
     dialogFormVisible.value = false
 }
 
+const imgList = ref([])
+
 const editApiFunc = async (row) => {
-    const res = await getApiById({ id: row.ID })
-    form.value = res.data.api
-    openDialog('edit')
+    const res = await getManageById({ id: row.ID })
+    form.value = res.data.manage
+    imgList.value = JSON.parse(form.value.rework_attachment)
+    openDialog('look')
 }
 
-const enterDialog = async () => {
-    apiForm.value.validate(async valid => {
-        if (valid) {
-            switch (type.value) {
-                case 'addApi':
-                    {
-                        const res = await createApi(form.value)
-                        if (res.code === 0) {
-                            ElMessage({
-                                type: 'success',
-                                message: '添加成功',
-                                showClose: true
-                            })
-                        }
-                        getTableData()
-                        closeDialog()
-                    }
 
-                    break
-                case 'edit':
-                    {
-                        const res = await updateApi(form.value)
-                        if (res.code === 0) {
-                            ElMessage({
-                                type: 'success',
-                                message: '编辑成功',
-                                showClose: true
-                            })
-                        }
-                        getTableData()
-                        closeDialog()
-                    }
-                    break
-                default:
-                    // eslint-disable-next-line no-lone-blocks
-                    {
-                        ElMessage({
-                            type: 'error',
-                            message: '未知操作',
-                            showClose: true
-                        })
-                    }
-                    break
-            }
-        }
-    })
-}
-
-const deleteApiFunc = async (row) => {
-    ElMessageBox.confirm('此操作将永久删除所有角色下该api, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-    })
-        .then(async () => {
-            const res = await deleteApi(row)
-            if (res.code === 0) {
-                ElMessage({
-                    type: 'success',
-                    message: '删除成功!'
-                })
-                if (tableData.value.length === 1 && page.value > 1) {
-                    page.value--
-                }
-                getTableData()
-            }
+const setApiFunc = async (row, status) => {
+    const res = await setStatus({ id: row.ID, status: status })
+    if (res.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: '状态更新成功',
+            showClose: true
         })
+    }
+    getTableData()
 }
 
 </script>

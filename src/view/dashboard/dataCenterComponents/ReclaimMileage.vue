@@ -1,22 +1,17 @@
 <template>
   <div class="ReclaimMileage-box">
-    <div
-      ref="echart"
-      class="ReclaimMileage-box-echarts"
-      :style="`width : ${chart?.clientWidth}px`"
-    />
+    <div ref="echart" class="ReclaimMileage-box-echarts" :style="`width : ${chart?.clientWidth}px`" />
 
     <div class="ReclaimMileage-box-data">
-      <div class="ReclaimMileage-box-data-left">
-        <div>MA</div>
-        <div class="number">1,240 <span>-52% ↓</span></div>
-        <div>昨日:902</div>
+      <div class="">
+        <div class="number">{{ total }} </div>
       </div>
-      <div class="ReclaimMileage-box-data-right">
+      <!-- <div class="ReclaimMileage-box-data-right">
+        <span>-52% ↓</span>
         <div>DI</div>
         <div class="number">2,240 <span style="color: #D3B379" >-24% ↓</span></div>
         <div>昨日:1098</div>
-      </div>
+      </div> -->
     </div>
 
   </div>
@@ -24,15 +19,47 @@
 <script setup>
 import * as echarts from 'echarts'
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-
+import { ElMessage } from 'element-plus'
+import {
+  getManageList
+} from '@/api/manage.js'
 const chart = ref(null)
 const echart = ref(null)
+const page = ref(1)
+const total = ref(0)
+const pageSize = ref(100000)
+const searchInfo = ref({})
 const initChart = () => {
-  chart.value = echarts.init(echart.value)
-  setOptions()
-  document.addEventListener('resize', () => {
-    chart.value?.resize()
+  getNcrCount()
+}
+
+
+const getNcrCount = async () => {
+  const res = await getManageList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  if (res.code === 0) {
+    statistics_department(res.data.list)
+    chart.value = echarts.init(echart.value)
+    setOptions()
+    document.addEventListener('resize', () => {
+      chart.value?.resize()
+    })
+    return
+  }
+  ElMessage({
+    type: 'error',
+    message: 'Network error',
+    showClose: true
   })
+}
+
+const statistics_department = (sd) => {
+  const map = new Map()
+  sd.forEach(item => {
+    if (!map.has(item.department)) {
+      map.set(item.department, true)
+    }
+  })
+  total.value = map.size
 }
 
 const setOptions = () => {
@@ -89,8 +116,8 @@ const setOptions = () => {
         type: 'line',
         smooth: true,
         stack: '总量',
-        symbolSize: 5,
-        showSymbol: false,
+        symbolSize: 100,
+        showSymbol: true,
         itemStyle: {
           normal: {
             color: '#23D0C4',
@@ -114,7 +141,7 @@ const setOptions = () => {
             ], false),
           }
         },
-        data: [250, 297, 242, 145, 343, 234, 121, 145, 163, 166, 146, 255]
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       },
     ]
   })
@@ -135,12 +162,12 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-
-.ReclaimMileage-box{
+.ReclaimMileage-box {
   height: 120px;
   overflow: hidden;
   position: relative;
-  &-echarts{
+
+  &-echarts {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -149,7 +176,8 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
   }
-  &-data{
+
+  &-data {
     position: absolute;
     top: 0;
     left: 0;
@@ -158,30 +186,34 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index : 10;
+    z-index: 10;
     user-select: none;
-    pointer-events:none;
-    &-left{
+    pointer-events: none;
+
+    &-left {
       height: 60%;
       border-right: 1px solid #eee;
       display: flex;
       align-items: flex-start;
       flex-direction: column;
       justify-content: center;
-      div{
+
+      div {
         color: #999;
         font-size: 12px;
         margin-bottom: 8px;
       }
     }
-    &-right{
+
+    &-right {
       height: 60%;
       padding-left: 10px;
       display: flex;
       align-items: flex-start;
       flex-direction: column;
       justify-content: center;
-      div{
+
+      div {
         color: #999;
         font-size: 12px;
         margin-bottom: 8px;
@@ -189,17 +221,21 @@ onUnmounted(() => {
     }
   }
 }
-.in-line{
-  --color : #5BC2A4;
+
+.in-line {
+  --color: #5BC2A4;
 }
-.out-line{
+
+.out-line {
   --color: #DF534E;
 }
-.number{
+
+.number {
   color: #1d1d1f !important;
   font-size: 18px !important;
   font-weight: 500;
-  span{
+
+  span {
     font-size: 12px;
     color: #DF534E;
     font-weight: 400;

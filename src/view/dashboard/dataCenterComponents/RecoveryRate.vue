@@ -1,21 +1,10 @@
 <template>
   <div class="ReclaimMileage-box">
-    <div
-      ref="echart"
-      class="ReclaimMileage-box-echarts"
-      :style="`width : ${chart?.clientWidth}px`"
-    />
+    <div ref="echart" class="ReclaimMileage-box-echarts" :style="`width : ${chart?.clientWidth}px`" />
 
     <div class="ReclaimMileage-box-data">
-      <div class="ReclaimMileage-box-data-left">
-        <div>MA</div>
-        <div class="number">1,240 <span>-52% ↓</span></div>
-        <div>昨日:902</div>
-      </div>
-      <div class="ReclaimMileage-box-data-right">
-        <div>DI</div>
-        <div class="number">2,240 <span style="color: #D3B379" >-24% ↓</span></div>
-        <div>昨日:1098</div>
+      <div>
+        <div class="number">20%</div>
       </div>
     </div>
 
@@ -135,12 +124,12 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-
-.ReclaimMileage-box{
+.ReclaimMileage-box {
   height: 120px;
   overflow: hidden;
   position: relative;
-  &-echarts{
+
+  &-echarts {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -149,7 +138,8 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
   }
-  &-data{
+
+  &-data {
     position: absolute;
     top: 0;
     left: 0;
@@ -158,30 +148,34 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index : 10;
+    z-index: 10;
     user-select: none;
-    pointer-events:none;
-    &-left{
+    pointer-events: none;
+
+    &-left {
       height: 60%;
       border-right: 1px solid #eee;
       display: flex;
       align-items: flex-start;
       flex-direction: column;
       justify-content: center;
-      div{
+
+      div {
         color: #999;
         font-size: 12px;
         margin-bottom: 8px;
       }
     }
-    &-right{
+
+    &-right {
       height: 60%;
       padding-left: 10px;
       display: flex;
       align-items: flex-start;
       flex-direction: column;
       justify-content: center;
-      div{
+
+      div {
         color: #999;
         font-size: 12px;
         margin-bottom: 8px;
@@ -189,17 +183,21 @@ onUnmounted(() => {
     }
   }
 }
-.in-line{
-  --color : #5BC2A4;
+
+.in-line {
+  --color: #5BC2A4;
 }
-.out-line{
+
+.out-line {
   --color: #DF534E;
 }
-.number{
+
+.number {
   color: #1d1d1f !important;
   font-size: 18px !important;
   font-weight: 500;
-  span{
+
+  span {
     font-size: 12px;
     color: #DF534E;
     font-weight: 400;

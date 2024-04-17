@@ -3,31 +3,32 @@
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
                 <el-form-item label="部门">
-                    <el-select v-model="value" placeholder="北京安新">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                    <el-select v-model="searchInfo.department" placeholder="北京安新">
+                        <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
+                            :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="类型">
                     <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                        <el-option v-for="item in moldList" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="类别">
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                    <el-select v-model="searchInfo.category" placeholder="请选择">
+                        <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="受检物名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="受检物名称" />
+                    <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
                 <el-form-item label="项目名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="项目名称" />
+                    <el-input v-model="searchInfo.project" placeholder="项目名称" />
                 </el-form-item>
                 <el-form-item label="供应商名称">
-                    <el-input v-model="searchInfo.apiGroup" placeholder="项目名称" />
+                    <el-input v-model="searchInfo.supplier" placeholder="项目名称" />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
@@ -38,28 +39,36 @@
         <div class="gva-table-box">
             <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
                 <el-table-column align="left" label="ID" min-width="150" prop="ID" sortable="custom" />
-                <el-table-column align="left" label="编号" min-width="150" prop="path" sortable="custom" />
-                <el-table-column align="left" label="部门" min-width="150" prop="apiGroup" sortable="custom" />
-                <el-table-column align="left" label="类型" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="类别" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="受检物名称" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="受检物号" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="处理方式" min-width="150" prop="description" sortable="custom" />
-                <el-table-column align="left" label="放行时间" min-width="150" prop="description" sortable="custom">
+                <el-table-column align="left" label="编号" min-width="150" prop="serialnumber" sortable="custom" />
+                <el-table-column align="left" label="部门" min-width="150" prop="department" sortable="custom" />
+                <el-table-column align="left" label="类型" min-width="150" prop="mold" sortable="custom" />
+                <el-table-column align="left" label="类别" min-width="150" prop="category" sortable="custom" />
+                <el-table-column align="left" label="受检物名称" min-width="150" prop="checkout_name" sortable="custom" />
+                <el-table-column align="left" label="受检物号" min-width="150" prop="checkout_number" sortable="custom" />
+                <el-table-column align="left" label="处理方式" min-width="150" prop="process_mode" sortable="custom" />
+                <el-table-column align="left" label="状态" min-width="150" prop="description" sortable="custom">
                     <template #default="scope">
-                        <div>
-                            {{ scope.row.method }} / {{ methodFilter(scope.row.method) }}
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag
+                                :type="scope.row.status === '1' ? 'success' : scope.row.status === '-1' ? 'danger' : 'info'"
+                                disable-transitions>{{
+                                    scope.row.status === '1' ? '同意' : scope.row.status === '-1' ? '拒绝' : '待审批'
+                                }}</el-tag>
                         </div>
+                    </template>
+                </el-table-column>
+                <el-table-column align="left" label="放行时间" min-width="150" prop="pass_date" sortable="custom">
+                    <template #default="scope">
+                        <i class="el-icon-time"></i>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.pass_date) }}</span>
                     </template>
                 </el-table-column>
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
                         <el-button icon="view" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
-                        <el-button icon="check" type="primary" link @click="deleteApiFunc(scope.row)">同意</el-button>
-                        <el-button icon="remove" type="primary" link @click="editApiFunc(scope.row)">拒绝</el-button>
-                        <el-button icon="circle-close" type="primary" link
-                            @click="editApiFunc(scope.row)">关闭</el-button>
+                        <el-button icon="check" type="primary" link @click="setApiFunc(scope.row, '1')">同意</el-button>
+                        <el-button icon="remove" type="primary" link @click="setApiFunc(scope.row, '-1')">拒绝</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -71,101 +80,61 @@
 
         </div>
 
-        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="70%">
+        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="40%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="编号" prop="path" style="width:25%">
-                    <el-input placeholder="受检物名称" size="mini" />
+                <el-form-item label="编号" prop="method" style="width:30%">
+                    <span>
+                        {{ form.serialnumber }}
+                    </span>
                 </el-form-item>
-                <el-form-item label="部门" prop="method" style="width:20%">
-                    <el-select v-model="form.method" placeholder="北京安新" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
+                <el-form-item label="受检物名称" prop="checkout_name" style="width:30%">
+                    <span>{{ form.checkout_name }}</span>
                 </el-form-item>
-                <el-form-item label="类型" prop="method" style="width:20%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
+                <el-form-item label="受检物号" prop="checkout_number" style="width:30%">
+                    <span>
+                        {{ form.checkout_number }}
+                    </span>
                 </el-form-item>
-                <el-form-item label="类别" prop="method" style="width:20%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
+                <el-form-item label="类别" prop="category" style="width:30%">
+                    <span>
+                        {{ form.category }}
+                    </span>
                 </el-form-item>
-                <el-form-item label="处理方式" prop="method" style="width:30%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
+                <el-form-item label="部门" prop="department" style="width:30%">
+                    <span>
+                        {{ form.department }}
+                    </span>
                 </el-form-item>
-                <el-form-item label="项目" prop="method" style="width:30%">
-                    <el-select v-model="form.method" placeholder="请选择" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
+                <el-form-item label="处理方式" prop="process_mode" style="width:30%">
+                    <span>
+                        {{ form.process_mode }}
+                    </span>
                 </el-form-item>
-                <el-form-item label="受检物名称" prop="path" style="width:30%">
-                    <el-input placeholder="受检物名称" size="mini" />
+                <el-form-item label="类型" prop="category" style="width:30%">
+                    <span>
+                        {{ form.mold }}
+                    </span>
                 </el-form-item>
-                <el-form-item label="受检物号" prop="path" style="width:30%">
-                    <el-input placeholder="受检物号" size="mini" />
+                <el-form-item label="状态" prop="status" style="width:30%">
+                    <template #default="scope">
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag :type="form.status === '1' ? 'success' : form.status === '-1' ? 'danger' : 'info'"
+                                disable-transitions>{{
+                                    form.status === '1' ? '同意' : form.status === '-1' ? '拒绝' : '待处理'
+                                }}</el-tag>
+                        </div>
+                    </template>
                 </el-form-item>
-                <el-form-item label="图纸号" prop="path" style="width:30%">
-                    <el-input placeholder="图纸号" size="mini" />
-                </el-form-item>
-                <el-form-item label="版本号" prop="path" style="width:30%">
-                    <el-input placeholder="版本号" size="mini" />
-                </el-form-item>
-                <el-form-item label="采购订单号" prop="path" style="width:30%">
-                    <el-input placeholder="采购订单号" size="mini" />
-                </el-form-item>
-                <el-form-item label="生产订单号" prop="path" style="width:30%">
-                    <el-input placeholder="生产订单号" size="mini" />
-                </el-form-item>
-                <el-form-item label="发货单号" prop="path" style="width:30%">
-                    <el-input placeholder="发货单号" size="mini" />
-                </el-form-item>
-                <el-form-item label="收货数量" prop="path" style="width:30%">
-                    <el-input placeholder="收货数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="货物拒收数量" prop="path" style="width:30%">
-                    <el-input placeholder="货物拒收数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="样品检验数量" prop="path" style="width:30%">
-                    <el-input placeholder="样品检验数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="样品拒收数量" prop="path" style="width:30%">
-                    <el-input placeholder="样品拒收数量" size="mini" />
-                </el-form-item>
-                <el-form-item label="供应商" prop="method" style="width:30%">
-                    <el-select v-model="form.method" placeholder="供应商" style="width:100%">
-                        <el-option v-for="item in methodOptions" :key="item.value"
-                            :label="`${item.label}(${item.value})`" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="检验日期" prop="method" style="width:30%">
-                    <el-date-picker v-model="value" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-                        :default-time="['00:00:00', '23:59:59']">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="不合格描述" prop="method" style="width:80%">
-                    <el-input type="textarea" placeholder="请输入内容" v-model="textarea" maxlength="50" show-word-limit
-                        :rows="10" />
-                </el-form-item>
-                <el-form-item label="图片上传" prop="method" style="width:100%">
-                    <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/"
-                        :on-change="handleChange" :file-list="fileList">
-                        <el-button size="small" type="primary">点击上传</el-button>
-                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-                    </el-upload>
+                <el-form-item label="放行时间" prop="pass_date" style="width:30%">
+                    <span>
+                        {{ formatDate(form.pass_date) }}
+                    </span>
                 </el-form-item>
             </el-form>
             <template #footer>
                 <div class="dialog-footer">
-                    <el-button @click="closeDialog">取 消</el-button>
-                    <el-button type="primary" @click="enterDialog">确 定</el-button>
+                    <el-button @click="closeDialog" v-if="isFormDisabled">取 消</el-button>
+                    <el-button type="primary" @click="enterDialog" v-if="isFormDisabled">确 定</el-button>
                 </div>
             </template>
         </el-dialog>
@@ -174,20 +143,17 @@
 
 <script setup>
 import {
-    getApiById,
-    getApiList,
-    createApi,
-    updateApi,
-    deleteApi,
-    deleteApisByIds,
-    freshCasbin
-} from '@/api/api'
-import { toSQLLine } from '@/utils/stringFun'
-import WarningBar from '@/components/warningBar/warningBar.vue'
+    getAuthorityList,
+    getGenreList,
+    getSupplierList,
+    getProjectList,
+    getManageList,
+    getManageById,
+    setStatus
+} from '@/api/manage.js'
+import { toSQLLine, formatDate } from '@/utils/stringFun'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { VideoCameraFilled } from '@element-plus/icons-vue'
-import { toDoc } from '@/utils/doc'
 
 defineOptions({
     name: 'Api',
@@ -199,11 +165,49 @@ const methodFilter = (value) => {
 }
 
 const apis = ref([])
+const departmentList = ref([])
+const genreList1 = ref([])
+const supplierList = ref([])
+const projectList = ref([])
 const form = ref({
-    path: '',
-    apiGroup: '',
-    method: '',
-    description: ''
+    serialnumber: "",
+    department: "",
+    mold: "",
+    category: "",
+    project: "",
+    checkout_name: "",
+    checkout_number: "",
+    graph_number: "",
+    version_number: "",
+    purchase_order: "",
+    production_order: "",
+    delivery_order: "",
+    packages_number: "",
+    reject_packages_number: "",
+    sample_checkout_number: "",
+    reject_sample_checkout_number: "",
+    supplier: "",
+    checkout_date: "",
+    describe: "",
+    photograph: "",
+    process_mode: "",
+    duty_department: "",
+    cause_desc: "",
+    fill_from_date: "",
+    disposal_concept: "",
+    rework_number: 0,
+    rework_man_hour: 0,
+    rework_quantities: "",
+    rework_process: "",
+    rework_plan_date: "0001-01-01T00:00:00Z",
+    rework_desc: "",
+    rework_attachment: "",
+    repair_plan_date: "0001-01-01T00:00:00Z",
+    repair_desc: "",
+    repair_attachment: "",
+    parts_desc: "",
+    series: "",
+    operation_type: ""
 })
 const methodOptions = ref([
     {
@@ -270,6 +274,19 @@ const handleCurrentChange = (val) => {
     getTableData()
 }
 
+
+const setApiFunc = async (row, status) => {
+    const res = await setStatus({ id: row.ID, status: status })
+    if (res.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: '状态更新成功',
+            showClose: true
+        })
+    }
+    getTableData()
+}
+
 // 排序
 const sortChange = ({ prop, order }) => {
     if (prop) {
@@ -282,9 +299,50 @@ const sortChange = ({ prop, order }) => {
     getTableData()
 }
 
+// 部门列表
+const department = async () => {
+    const table = await getAuthorityList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        departmentList.value = table.data.list
+    }
+}
+
+department()
+
+// 类别列表
+const genreList = async () => {
+    const table = await getGenreList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        genreList1.value = table.data.list
+    }
+}
+
+genreList()
+
+// 类别列表
+const supplier = async () => {
+    const table = await getSupplierList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        supplierList.value = table.data.list
+    }
+}
+
+supplier()
+
+// 类别列表
+const project = async () => {
+    const table = await getProjectList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 0) {
+        projectList.value = table.data.list
+    }
+}
+
+project()
+
+const operation = ref("4")
 // 查询
 const getTableData = async () => {
-    const table = await getApiList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getManageList({ page: page.value, pageSize: pageSize.value, keyword: operation.value, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -294,6 +352,7 @@ const getTableData = async () => {
 }
 
 getTableData()
+
 
 // 批量操作
 const handleSelectionChange = (val) => {
@@ -333,10 +392,44 @@ const apiForm = ref(null)
 const initForm = () => {
     apiForm.value.resetFields()
     form.value = {
-        path: '',
-        apiGroup: '',
-        method: '',
-        description: ''
+        serialnumber: "",
+        department: "",
+        mold: "",
+        category: "",
+        project: "",
+        checkout_name: "",
+        checkout_number: "",
+        graph_number: "",
+        version_number: "",
+        purchase_order: "",
+        production_order: "",
+        delivery_order: "",
+        packages_number: "",
+        reject_packages_number: "",
+        sample_checkout_number: "",
+        reject_sample_checkout_number: "",
+        supplier: "",
+        checkout_date: "",
+        describe: "",
+        photograph: "",
+        process_mode: "",
+        duty_department: "",
+        cause_desc: "",
+        fill_from_date: "",
+        disposal_concept: "",
+        rework_number: 0,
+        rework_man_hour: 0,
+        rework_quantities: "",
+        rework_process: "",
+        rework_plan_date: "0001-01-01T00:00:00Z",
+        rework_desc: "",
+        rework_attachment: "",
+        repair_plan_date: "0001-01-01T00:00:00Z",
+        repair_desc: "",
+        repair_attachment: "",
+        parts_desc: "",
+        series: "",
+        operation_type: ""
     }
 }
 
@@ -344,11 +437,8 @@ const dialogTitle = ref('添加不合格品')
 const dialogFormVisible = ref(false)
 const openDialog = (key) => {
     switch (key) {
-        case 'addApi':
-            dialogTitle.value = '添加不合格品'
-            break
-        case 'edit':
-            dialogTitle.value = '编辑Api'
+        case 'look':
+            dialogTitle.value = '查看放行'
             break
         default:
             break
@@ -362,9 +452,9 @@ const closeDialog = () => {
 }
 
 const editApiFunc = async (row) => {
-    const res = await getApiById({ id: row.ID })
-    form.value = res.data.api
-    openDialog('edit')
+    const res = await getManageById({ id: row.ID })
+    form.value = res.data.manage
+    openDialog('look')
 }
 
 const enterDialog = async () => {

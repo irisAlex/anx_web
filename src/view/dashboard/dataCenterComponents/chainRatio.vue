@@ -1,36 +1,57 @@
 <template>
   <div class="chainRatio-box">
-    <div
-      ref="echart"
-      class="chainRatio-box-echarts"
-      style="height: 120px"
-    />
-    <div class="chainRatio-box-values">
-      <div class="chainRatio-box-values-item in-line">在线<span>80</span></div>
-      <div class="chainRatio-box-values-item out-line">离线<span>40</span></div>
-    </div>
+    <div ref="echart" class="chainRatio-box-echarts" style="height: 120px" />
+    <!-- <div class="chainRatio-box-values">
+      <div class="chainRatio-box-values-item in-line">返工订单<span>80</span></div>
+      <div class="chainRatio-box-values-item out-line">返修订单<span>40</span></div>
+      <div class="chainRatio-box-values-item out-line">让步放行<span>40</span></div>
+      <div class="chainRatio-box-values-item out-line">配座订单<span>40</span></div>
+    </div> -->
   </div>
 </template>
 <script setup>
 import * as echarts from 'echarts'
 import { nextTick, onMounted, onUnmounted, ref, shallowRef, watchEffect } from 'vue'
-
+import { ElMessage } from 'element-plus'
+import {
+  getManageList
+} from '@/api/manage.js'
 const chart = shallowRef(null)
 const echart = ref(null)
+const page = ref(1)
+const total = ref(0)
+const pageSize = ref(100000)
+const searchInfo = ref({})
 const initChart = () => {
-  chart.value = echarts.init(echart.value)
-  setOptions()
+  getNcrCount()
 }
-const setOptions = () => {
+
+
+const getNcrCount = async () => {
+  const res = await getManageList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  if (res.code === 0) {
+    chart.value = echarts.init(echart.value)
+    setOptions(res.data.total)
+    return
+  }
+  ElMessage({
+    type: 'error',
+    message: 'Network error',
+    showClose: true
+  })
+}
+
+
+const setOptions = (total) => {
   chart.value.setOption({
     backgroundColor: '#fbfbfb',
     title: {
-      text: '120',
+      text: total,
       textStyle: {
         color: '#1d1d1f',
         fontSize: 14
       },
-      subtext: '总台数',
+      subtext: '总不合格数',
       subtextStyle: {
         color: '#999',
         fontSize: 13
@@ -130,13 +151,13 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-
-.chainRatio-box{
+.chainRatio-box {
   width: 100%;
   height: 120px;
   overflow: hidden;
   position: relative;
-  &-echarts{
+
+  &-echarts {
     width: 100%;
     height: 120px;
     position: absolute;
@@ -144,19 +165,21 @@ onUnmounted(() => {
     top: 0;
     bottom: 0;
   }
-  &-values{
+
+  &-values {
     position: absolute;
     right: 0;
     top: 0;
     transform: translateY(50%);
 
-    &-item{
+    &-item {
       font-size: 13px;
       margin-bottom: 10px;
       color: #777;
       position: relative;
       padding-left: 10px;
-      &::before{
+
+      &::before {
         content: '';
         position: absolute;
         width: 8px;
@@ -167,17 +190,20 @@ onUnmounted(() => {
         background-color: var(--color);
         transform: translateY(50%);
       }
-      span{
+
+      span {
         color: var(--color);
         margin-left: 16px;
       }
     }
   }
 }
-.in-line{
-  --color : #5BC2A4;
+
+.in-line {
+  --color: #5BC2A4;
 }
-.out-line{
+
+.out-line {
   --color: #DF534E;
 }
 </style>

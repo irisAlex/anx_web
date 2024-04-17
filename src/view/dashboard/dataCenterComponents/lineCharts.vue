@@ -1,10 +1,6 @@
 <template>
   <div class="lineCharts-box">
-    <div
-      ref="echart"
-      class="lineCharts-box-echarts"
-      :style="`width : ${chart?.clientWidth}px`"
-    />
+    <div ref="echart" class="lineCharts-box-echarts" :style="`width : ${chart?.clientWidth}px`" />
   </div>
 </template>
 <script setup>
@@ -21,8 +17,10 @@ const initChart = () => {
   })
 }
 const xLabel = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-const goOutSchool = [42871, 40494, 41470, 44968, 43653, 41899, 47615, 43116, 49451, 42149, 48873, 46551]
-
+const reworkData = [2, 3, 1, 7, 7, 8, 2, 7, 4, 5, 7, 4]
+const repairData = [9, 8, 4, 6, 7, 9, 3, 4, 5, 1, 1, 4]
+const partsData = [1, 3, 4, 3, 4, 4, 4, 4, 5, 8, 3, 2]
+const passData = [7, 2, 9, 5, 6, 9, 2, 4, 5, 9, 1, 3]
 const setOptions = () => {
   chart.value.setOption({
     backgroundColor: 'transparent',
@@ -43,10 +41,16 @@ const setOptions = () => {
       icon: 'path://M0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z',
       data: [
         {
-          name: '设备数',
+          name: '返工',
         },
         {
-          name: '在线目标',
+          name: '返修',
+        },
+        {
+          name: '配做',
+        },
+        {
+          name: '让步放行',
         },
       ],
     },
@@ -73,7 +77,7 @@ const setOptions = () => {
           textStyle: {
             color: '#92969E',
           },
-          formatter: function(data) {
+          formatter: function (data) {
             return data
           },
         },
@@ -91,7 +95,7 @@ const setOptions = () => {
     ],
     yAxis: [
       {
-        name: '单位：笔',
+        name: '单位：单',
         nameTextStyle: {
           color: '#777',
         },
@@ -110,9 +114,9 @@ const setOptions = () => {
           textStyle: {
             color: '#92969E',
           },
-          formatter: function(value) {
+          formatter: function (value) {
             if (value !== 0) {
-              return `${value / 1000}k`
+              return `${value}`
             }
             return value
           },
@@ -124,24 +128,7 @@ const setOptions = () => {
     ],
     series: [
       {
-        name: '在线目标',
-        type: 'line',
-        showSymbol: false,
-        smooth: true,
-        markLine: {
-          symbol: 'none',
-          data: [
-            {
-              name: '在线目标',
-              yAxis: 47000,
-              lineStyle: { width: 1.656, color: '#8C9CDA', opacity: 0.8 },
-              label: { show: false },
-            },
-          ],
-        },
-      },
-      {
-        name: '设备数',
+        name: '返工',
         type: 'line',
         symbol: 'circle', // 默认是空心圆（中间是白色的），改成实心圆
         showAllSymbol: true,
@@ -150,7 +137,7 @@ const setOptions = () => {
         lineStyle: {
           normal: {
             width: 2,
-            color: '#75BFA5', // 线条颜色
+            color: '#3859d6', // 线条颜色
           },
         },
         areaStyle: {
@@ -167,10 +154,106 @@ const setOptions = () => {
               }
             ], false),
             shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
-            shadowBlur: 3,
+            shadowBlur: 0,
           },
         },
-        data: goOutSchool,
+        data: reworkData,
+      },
+      {
+        name: '返修',
+        type: 'line',
+        symbol: 'circle', // 默认是空心圆（中间是白色的），改成实心圆
+        showAllSymbol: true,
+        symbolSize: 0,
+        smooth: true,
+        lineStyle: {
+          normal: {
+            width: 2,
+            color: '#90EE90', // 线条颜色
+          },
+        },
+        areaStyle: {
+          // 区域填充样式
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgba(50, 216, 205, .8)'
+              },
+              {
+                offset: 1,
+                color: 'rgba(255, 255, 255, 0.2)'
+              }
+            ], false),
+            shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
+            shadowBlur: 0,
+          },
+        },
+        data: repairData,
+      },
+      {
+        name: '配做',
+        type: 'line',
+        symbol: 'circle', // 默认是空心圆（中间是白色的），改成实心圆
+        showAllSymbol: true,
+        symbolSize: 0,
+        smooth: true,
+        lineStyle: {
+          normal: {
+            width: 2,
+            color: '#FFC125', // 线条颜色
+          },
+        },
+        areaStyle: {
+          // 区域填充样式
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgba(50, 216, 205, .8)'
+              },
+              {
+                offset: 1,
+                color: 'rgba(255, 255, 255, 0.2)'
+              }
+            ], false),
+            shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
+            shadowBlur: 0,
+          },
+        },
+        data: partsData,
+      },
+      {
+        name: '让步放行',
+        type: 'line',
+        symbol: 'circle', // 默认是空心圆（中间是白色的），改成实心圆
+        showAllSymbol: true,
+        symbolSize: 0,
+        smooth: true,
+        lineStyle: {
+          normal: {
+            width: 2,
+            color: '#d65538', // 线条颜色
+          },
+        },
+        areaStyle: {
+          // 区域填充样式
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgba(50, 216, 205, .8)'
+              },
+              {
+                offset: 1,
+                color: 'rgba(255, 255, 255, 0.2)'
+              }
+            ], false),
+            shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
+            shadowBlur: 0,
+          },
+        },
+        data: passData,
       },
     ],
   })
@@ -193,12 +276,12 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-
-.lineCharts-box{
+.lineCharts-box {
   height: 360px;
   overflow: hidden;
   position: relative;
-  &-echarts{
+
+  &-echarts {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -208,10 +291,12 @@ onUnmounted(() => {
     height: 100%;
   }
 }
-.in-line{
-  --color : #5BC2A4;
+
+.in-line {
+  --color: #5BC2A4;
 }
-.out-line{
+
+.out-line {
   --color: #DF534E;
 }
 </style>

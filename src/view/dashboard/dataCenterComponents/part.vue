@@ -1,10 +1,6 @@
 <template>
   <div class="lineCharts-box">
-    <div
-      ref="echart"
-      class="lineCharts-box-echarts"
-      :style="`width : ${chart?.clientWidth}px`"
-    />
+    <div ref="echart" class="lineCharts-box-echarts" :style="`width : ${chart?.clientWidth}px`" />
   </div>
 </template>
 <script setup>
@@ -21,10 +17,10 @@ const initChart = () => {
   })
 }
 var data1 = [
-  { value: 1220, name: 'Jutze 2D AOI' },
-  { value: 1400, name: 'Jutze 3D AOI' },
-  { value: 4012, name: 'Jutze Twins' },
-  { value: 2488, name: 'Jutze Twins2' },
+  { value: 1220, name: '原材料' },
+  { value: 1400, name: '供应商' },
+  { value: 4012, name: '客户' },
+  { value: 2488, name: '内部' },
 ]
 let num = 0
 data1.forEach(item => {
@@ -36,7 +32,7 @@ const setOptions = () => {
   chart.value.setOption({
     backgroundColor: 'transparent',
     title: {
-      text: '总台数',
+      text: '',
       top: '23%',
       textAlign: 'center',
       left: '48%',
@@ -100,12 +96,12 @@ const setOptions = () => {
         }
       },
       data: data1,
-      formatter: function(name) {
+      formatter: function (name) {
         if (data1 && data1.length) {
           for (let i = 0; i < data1.length; i++) {
             if (name === data1[i].name) {
               const value = data1[i].value / num * 100
-              const show = value.toFixed(2) > 20 ? `${value.toFixed(2)}% ↑` : `${value.toFixed(2)}% ↓`
+              const show = value.toFixed(2) > 20 ? '' : ''
               const color = value.toFixed(2) > 20 ? 'part1' : 'part2'
               return (
                 '{name| ' + name + '}  ' + '{value| ' + data1[i].value + '}' + '{' + color + '| ' + show + '}'
@@ -127,7 +123,7 @@ const setOptions = () => {
         },
         itemStyle: {
           normal: {
-            color: function(params) {
+            color: function (params) {
               return colorList[params.dataIndex]
             },
           },
@@ -156,11 +152,11 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-
-.lineCharts-box{
+.lineCharts-box {
   height: 360px;
   position: relative;
-  &-echarts{
+
+  &-echarts {
     position: absolute;
     top: 0;
     left: 0;
@@ -170,10 +166,12 @@ onUnmounted(() => {
     height: 100%;
   }
 }
-.in-line{
-  --color : #5BC2A4;
+
+.in-line {
+  --color: #5BC2A4;
 }
-.out-line{
+
+.out-line {
   --color: #DF534E;
 }
 </style>
