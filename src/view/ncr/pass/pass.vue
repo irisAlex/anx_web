@@ -2,32 +2,32 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门">
+                <el-form-item label="部门" style="width:10%">
                     <el-select v-model="searchInfo.department" placeholder="北京安新">
                         <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
                             :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型">
+                <el-form-item label="类型" style="width:10%">
                     <el-select v-model="value" placeholder="请选择">
                         <el-option v-for="item in moldList" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别">
+                <el-form-item label="类别" style="width:10%">
                     <el-select v-model="searchInfo.category" placeholder="请选择">
                         <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称">
+                <el-form-item label="受检物名称" style="width:10%">
                     <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
-                <el-form-item label="项目名称">
+                <el-form-item label="项目名称" style="width:10%">
                     <el-input v-model="searchInfo.project" placeholder="项目名称" />
                 </el-form-item>
-                <el-form-item label="供应商名称">
+                <el-form-item label="供应商名称" style="width:10%">
                     <el-input v-model="searchInfo.supplier" placeholder="项目名称" />
                 </el-form-item>
                 <el-form-item>
@@ -57,10 +57,11 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column align="left" label="放行时间" min-width="150" prop="pass_date" sortable="custom">
+                <el-table-column align="left" label="放行时间" min-width="150" prop="deferpass_datered_date"
+                    sortable="custom">
                     <template #default="scope">
                         <i class="el-icon-time"></i>
-                        <span style="margin-left: 10px">{{ formatDate(scope.row.pass_date) }}</span>
+                        <span style="margin-left: 10px">{{ formatDate(scope.row.deferpass_datered_date) }}</span>
                     </template>
                 </el-table-column>
 

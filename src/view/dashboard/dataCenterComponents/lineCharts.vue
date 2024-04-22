@@ -137,7 +137,7 @@ const setOptions = () => {
         lineStyle: {
           normal: {
             width: 2,
-            color: '#3859d6', // 线条颜色
+            color: '#3333FF', // 线条颜色
           },
         },
         areaStyle: {
@@ -153,7 +153,7 @@ const setOptions = () => {
                 color: 'rgba(255, 255, 255, 0.2)'
               }
             ], false),
-            shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
+            shadowColor: 'rgba(102,102,255,0.52)', // 阴影颜色
             shadowBlur: 0,
           },
         },
@@ -169,7 +169,7 @@ const setOptions = () => {
         lineStyle: {
           normal: {
             width: 2,
-            color: '#90EE90', // 线条颜色
+            color: '#66cc00', // 线条颜色
           },
         },
         areaStyle: {
@@ -185,7 +185,7 @@ const setOptions = () => {
                 color: 'rgba(255, 255, 255, 0.2)'
               }
             ], false),
-            shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
+            shadowColor: 'rgba(102,204,0,0.52)', // 阴影颜色
             shadowBlur: 0,
           },
         },
@@ -201,7 +201,7 @@ const setOptions = () => {
         lineStyle: {
           normal: {
             width: 2,
-            color: '#FFC125', // 线条颜色
+            color: '#FF9933', // 线条颜色
           },
         },
         areaStyle: {
@@ -210,14 +210,14 @@ const setOptions = () => {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               {
                 offset: 0,
-                color: 'rgba(50, 216, 205, .8)'
+                color: 'rgba(255, 216, 205, .8)'
               },
               {
                 offset: 1,
                 color: 'rgba(255, 255, 255, 0.2)'
               }
             ], false),
-            shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
+            shadowColor: 'rgba(102,204,0,0.52)', // 阴影颜色
             shadowBlur: 0,
           },
         },
@@ -233,7 +233,7 @@ const setOptions = () => {
         lineStyle: {
           normal: {
             width: 2,
-            color: '#d65538', // 线条颜色
+            color: '#FF6666', // 线条颜色
           },
         },
         areaStyle: {

@@ -53,7 +53,11 @@
                             status="success"></el-progress>
                     </template>
                 </el-table-column>
-                <el-table-column align="left" label="当前负责人" min-width="150" prop="duty_department" sortable="custom" />
+                <el-table-column align="left" label="当前负责人" min-width="150" prop="" sortable="custom">
+                    <template #default="scope">
+                        <el-tag type="info">{{ findPrincipal(scope.row, scope.row.a3_step) }}</el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column align="left" label="计划时间" min-width="150" prop="checkout_date" sortable="custom">
                     <template #default="scope">
                         <i class="el-icon-time"></i>
@@ -69,8 +73,8 @@
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="view" type="primary" link
-                            @click="editApiFunc(scope.row, 'check')">查看</el-button>
+                        <el-button icon="download" type="primary" link
+                            @click="editApiFunc(scope.row, 'check')">下载</el-button>
                         <el-button type="primary" icon="setting" link @click="openDialog(scope.row, 'setting')">
                             配置
                         </el-button>
@@ -170,29 +174,26 @@
                                             <span> {{ scope.$index + 1 }}</span>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column label="应急相应措施(围堵)" align="center" min-width="150"
-                                        prop="product_name">
+                                    <el-table-column label="应急相应措施(围堵)" align="center" min-width="150" prop="scheme">
                                         <template #default="scope">
                                             <el-input v-model="scope.row.scheme" @input='handleChange(3)'></el-input>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column label="负责人" align="center" min-width="150" prop="product_name">
+                                    <el-table-column label="负责人" align="center" min-width="150" prop="name">
                                         <template #default="scope">
                                             <el-input v-model="scope.row.name"></el-input>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column label="日期" align="center" min-width="150" prop="product_name">
+                                    <el-table-column label="日期" align="center" min-width="150" prop="date">
                                         <template #default="scope">
                                             <el-date-picker v-model="scope.row.date" type="date" placeholder="选择日期"
                                                 value-format="YYYY-MM-DDT15:04:05Z">
                                             </el-date-picker>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column label="状态" min-width="150" prop="w_serialnumber">
+                                    <el-table-column label="状态" align="center" min-width="150" prop="state">
                                         <template #default="scope">
-                                            <el-switch v-model="scope.row.state" active-color="#13ce66"
-                                                inactive-color="#D3D3D3">
-                                            </el-switch>
+                                            <Cri :defaultValue="scope.row.state" v-model="scope.row.state" />
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -203,31 +204,7 @@
                         </el-timeline-item>
                         <el-timeline-item timestamp="4.原因分析" placement="top" :class="isDisabled4" v-if="isShow4">
                             <el-card>
-
-                                <!-- <el-table :data="tableCauseData" border style="width: 100%;" :stripe="true">
-                                    <el-table-column label="" align="center" min-width="50" prop="product_serialnumber">
-                                        <template #default="scope">
-                                            <span>why?</span>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="1.为什么会发生这个问题？" align="center" min-width="150"
-                                        prop="product_name">
-                                        <template #default="scope">
-                                            <el-input v-model="scope.row.whyIssue" @input='handleChange(4)'></el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="2.为什么没有发现序列问题？" align="center" min-width="150"
-                                        prop="product_name">
-                                        <template #default="scope">
-                                            <el-input v-model="scope.row.sIssue" @input='handleChange(4)'></el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="3.为什么产品检验没有发现粗糙度问题" min-width="150" prop="w_serialnumber">
-                                        <template #default="scope">
-                                            <el-input v-model="scope.row.cIssue" @input='handleChange(4)'></el-input>
-                                        </template>
-                                    </el-table-column>
-                                </el-table> -->
+                                <FishBone :height="400" @click-node="onClickNode" :id="20" />
                             </el-card>
                         </el-timeline-item>
                         <el-timeline-item timestamp="5.根本原因确认" placement="top" :class="isDisabled5" v-if="isShow5">
@@ -286,9 +263,7 @@
                                     </el-table-column>
                                     <el-table-column label="状态" min-width="150" prop="w_serialnumber">
                                         <template #default="scope">
-                                            <el-switch v-model="scope.row.state" active-color="#13ce66"
-                                                inactive-color="#D3D3D3">
-                                            </el-switch>
+                                            <Cri :defaultValue="scope.row.state" v-model="scope.row.state" />
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -337,9 +312,7 @@
                                     </el-table-column>
                                     <el-table-column label="状态" min-width="150" prop="w_serialnumber">
                                         <template #default="scope">
-                                            <el-switch v-model="scope.row.state" active-color="#13ce66"
-                                                inactive-color="#D3D3D3">
-                                            </el-switch>
+                                            <Cri :defaultValue="scope.row.state" v-model="scope.row.state" />
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -376,9 +349,7 @@
                                     </el-table-column>
                                     <el-table-column label="状态" min-width="150" prop="w_serialnumber">
                                         <template #default="scope">
-                                            <el-switch v-model="scope.row.state" active-color="#13ce66"
-                                                inactive-color="#D3D3D3">
-                                            </el-switch>
+                                            <Cri :defaultValue="scope.row.state" v-model="scope.row.state" />
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -415,9 +386,7 @@
                                     </el-table-column>
                                     <el-table-column label="状态" min-width="150" prop="w_serialnumber">
                                         <template #default="scope">
-                                            <el-switch v-model="scope.row.state" active-color="#13ce66"
-                                                inactive-color="#D3D3D3">
-                                            </el-switch>
+                                            <Cri :defaultValue="scope.row.state" v-model="scope.row.state" />
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -458,13 +427,6 @@
                 </div>
             </template>
         </el-drawer>
-
-
-
-        <div>
-            dfdsafasd
-            <FishBone />
-        </div>
     </div>
 
 
@@ -477,18 +439,24 @@ import {
     getProjectList,
     updateManage,
     getManageById,
-    getManageList,
-    setPassDate,
-    getUserInfo
+    getManageList
 } from '@/api/manage.js'
 import { toSQLLine, formatDate } from '@/utils/stringFun'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { strToJson } from '@/utils/format'
 import FishBone from '@/components/fishBone/index.vue'
+import { useUserStore } from '@/pinia/modules/user'
+import Cri from '@/components/circle/index.vue'
+
 defineOptions({
     name: 'Setting',
 })
+
+const cir = ref(0)
+const stateAdd = () => {
+    return cir.value = 1.5
+}
 
 const percentage = ref(0)
 const dialogFormVisible = ref(false)
@@ -523,6 +491,15 @@ const openDialog = (row, key) => {
     showSettingDrawer(key, row)
 }
 
+
+function onClickNode(data) {
+    form.value.a3_affirm = JSON.stringify(data)
+}
+
+function onClickCircle(data) {
+    console.log(data)
+}
+
 const handleClose = () => {
     initForm()
     initDraw()
@@ -552,7 +529,6 @@ const showSettingDrawer = async (key, row) => {
         return
     }
     permissionProcess()
-    getUInfo()
     drawer.value = true
 }
 const isDisabled9 = ref('disabled')
@@ -575,7 +551,7 @@ const isShow6 = ref(false)
 const isShow7 = ref(false)
 const isShow8 = ref(false)
 
-
+const userStore = useUserStore()
 const setp = ref(0)
 const permissionProcess = () => {
     for (let item of configure.value) {
@@ -583,34 +559,19 @@ const permissionProcess = () => {
             const tmp = 'isShow' + item.issue_number.toString()
             const tmp1 = 'isDisabled' + item.issue_number.toString()
             eval(tmp).value = true
-            if (U.value === item.principal) {
+            if (userStore.userInfo.userName === item.principal) {
                 eval(tmp1).value = ''
             }
         }
     }
 }
 
+
 const handleChange = (ste) => {
     setp.value = ste
 }
-
-const U = ref('')
-const getUInfo = async () => {
-    const res = await getUserInfo()
-    if (res.code === 0) {
-        U.value = res.data.userInfo.userName
-        return
-    }
-    ElMessage({
-        type: 'error',
-        message: '获取用户信息失败',
-        showClose: true
-    })
-}
-
 const initDraw = () => {
     setp.value = 0
-    U.value = ''
     isDisabled9.value = 'disabled'
     isDisabled1.value = 'disabled'
     isDisabled2.value = 'disabled'
@@ -724,19 +685,19 @@ const initDraw = () => {
             name: '',
             date: '',
             scheme: "",
-            state: ""
+            state: 1
         },
         {
             name: '',
             date: '',
             scheme: "",
-            state: ""
+            state: 1
         },
         {
             name: '',
             date: '',
             scheme: "",
-            state: ""
+            state: 1
         }
     ])
 
@@ -752,7 +713,7 @@ const initDraw = () => {
             name: '',
             date: '',
             scheme: "",
-            state: "33"
+            state: ""
         },
         {
             name: '',
@@ -809,38 +770,40 @@ const initDraw = () => {
 const tableIssueData = ref([{
     describe: "(what)这是什么问题？",
     issue: "",
-    isIssue: true
+    isIssue: false
 }, {
     describe: "(where)问题在哪里出现？",
     issue: "",
-    isIssue: true
+    isIssue: false
 },
 {
     describe: "(when)问题发生的时间？",
     issue: "",
-    isIssue: true
+    isIssue: false
 },
 {
     describe: "(why)为什么说这是一个问题？",
     issue: "",
-    isIssue: true
+    isIssue: false
 },
 {
     describe: "(who)谁发现&谁制造？",
     issue: "",
-    isIssue: true
+    isIssue: false
 },
 {
     describe: "(how)问题如何被发现？",
     issue: "",
-    isIssue: true
+    isIssue: false
 },
 {
     describe: "(how much/many)程度/数量",
     issue: "",
-    isIssue: true
+    isIssue: false
 },
 ])
+
+
 
 
 //问题3
@@ -1011,14 +974,14 @@ const configure = ref([
         title: "1.发现问题",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 1
     },
     {
         title: "2.问题描述",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 2
     },
     {
@@ -1032,41 +995,41 @@ const configure = ref([
         title: "4.原因分析",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 4
     },
     {
         title: "5.根本原因确认",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 5
     },
     {
         title: "6.纠正措施",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 6
     },
     {
         title: "7.措施验证",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 7
     },
     {
         title: "8.保持改进结果",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 8
     }, {
         title: "9.传递",
         principal: "",
         department: "",
-        limit_date: 3,
+        limit_date: 0,
         issue_number: 9
     }
 ])
@@ -1137,12 +1100,16 @@ const form = ref({
     a3_setting: "",
     a3_step: 0
 })
-// 删除
-const deleteTableData = (row) => {
-    const index = tablePartsData.value.indexOf(row);
-    if (index !== -1) {
-        tablePartsData.value.splice(index, 1);
+
+
+const findPrincipal = (row, step) => {
+    const setting = ref([])
+    if (row.a3_setting !== '') {
+        setting.value = JSON.parse(row.a3_setting)
+        let name = setting.value.find(item => item.issue_number == step)
+        return name.principal
     }
+    return '暂无配置负责人'
 }
 
 const methodOptions = ref([
@@ -1181,7 +1148,6 @@ const moldList = ref([
     }
 ])
 
-const type = ref('')
 const rules = ref({
     path: [{ required: true, message: '请输入api路径', trigger: 'blur' }],
     apiGroup: [
@@ -1392,20 +1358,20 @@ const initForm = () => {
             title: "1.发现问题",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 1
         },
         {
             title: "2.问题描述",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 2
         },
         {
             title: "3.应急响应措施",
             principal: "",
-            limit_date: 3,
+            limit_date: 0,
             department: "",
             issue_number: 3
         },
@@ -1413,41 +1379,41 @@ const initForm = () => {
             title: "4.原因分析",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 4
         },
         {
             title: "5.根本原因确认",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 5
         },
         {
             title: "6.纠正措施",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 6
         },
         {
             title: "7.措施验证",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 7
         },
         {
             title: "8.保持改进结果",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 8
         }, {
             title: "9.传递",
             principal: "",
             department: "",
-            limit_date: 3,
+            limit_date: 0,
             issue_number: 9
         }
     ])
@@ -1456,19 +1422,6 @@ const initForm = () => {
 const closeDialog = () => {
     initForm()
     drawer.value = false
-}
-
-
-const setPassDateFunc = async (row, ot) => {
-    const res = await setPassDate({ id: row.ID, operation_type: ot })
-    if (res.code === 0) {
-        ElMessage({
-            type: 'success',
-            message: '放行更新成功',
-            showClose: true
-        })
-    }
-    getTableData()
 }
 
 const enterDialog = async () => {
@@ -1571,6 +1524,10 @@ const enterDialog = async () => {
             }
         }
     }
+}
+
+.el-card__body {
+    height: 800px;
 }
 
 .disabled {

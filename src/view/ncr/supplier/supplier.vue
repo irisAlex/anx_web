@@ -85,20 +85,12 @@ import {
 
 } from '@/api/supplier'
 import { toSQLLine } from '@/utils/stringFun'
-import WarningBar from '@/components/warningBar/warningBar.vue'
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { VideoCameraFilled } from '@element-plus/icons-vue'
-import { toDoc } from '@/utils/doc'
 
 defineOptions({
     name: 'Api',
 })
-
-const methodFilter = (value) => {
-    const target = methodOptions.value.filter(item => item.value === value)[0]
-    return target && `${target.label}`
-}
 
 const apis = ref([])
 const form = ref({
@@ -109,28 +101,6 @@ const form = ref({
     product: '',
     contacts: ''
 })
-const methodOptions = ref([
-    {
-        value: 'POST',
-        label: '创建',
-        type: 'success'
-    },
-    {
-        value: 'GET',
-        label: '查看',
-        type: ''
-    },
-    {
-        value: 'PUT',
-        label: '更新',
-        type: 'warning'
-    },
-    {
-        value: 'DELETE',
-        label: '删除',
-        type: 'danger'
-    }
-])
 
 const type = ref('')
 const rules = ref({
@@ -201,34 +171,6 @@ const handleSelectionChange = (val) => {
     apis.value = val
 }
 
-const deleteVisible = ref(false)
-const onDelete = async () => {
-    const ids = apis.value.map(item => item.ID)
-    const res = await deleteApisByIds({ ids })
-    if (res.code === 0) {
-        ElMessage({
-            type: 'success',
-            message: res.msg
-        })
-        if (tableData.value.length === ids.length && page.value > 1) {
-            page.value--
-        }
-        deleteVisible.value = false
-        getTableData()
-    }
-}
-const freshVisible = ref(false)
-const onFresh = async () => {
-    const res = await freshCasbin()
-    if (res.code === 0) {
-        ElMessage({
-            type: 'success',
-            message: res.msg
-        })
-    }
-    freshVisible.value = false
-}
-
 // 弹窗相关
 const apiForm = ref(null)
 const initForm = () => {
@@ -276,7 +218,6 @@ const enterDialog = async () => {
             switch (type.value) {
                 case 'addApi':
                     {
-                        console.log(form.value)
                         const res = await createSupplierApi(form.value)
                         if (res.code === 0) {
                             ElMessage({

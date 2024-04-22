@@ -32,6 +32,10 @@ import {
 } from '@/api/manage.js'
 
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/pinia/modules/user'
+import { useRouter } from 'vue-router'
+
+const userStore = useUserStore()
 
 
 defineOptions({
@@ -56,7 +60,7 @@ const count = ref(0)
 const activeName = ref('first')
 
 const getUserMessages = async () => {
-    const table = await getMessage({ name: 'admin' })
+    const table = await getMessage({ name: userStore.userInfo.userName })
     if (table.code === 0) {
         userList.value = table.data.list
         count.value = table.data.total
@@ -66,6 +70,7 @@ const getUserMessages = async () => {
         isDot.value = true
     }
 }
+const router = useRouter()
 
 getUserMessages()
 
@@ -79,8 +84,10 @@ const changeMessageState = async (id) => {
         })
         return
     }
-
-    getUserMessages()
+    // getUserMessages()
+    router.push({ name: 'abnormal' }).then(() => {
+        window.location.reload()
+    })
 }
 
 

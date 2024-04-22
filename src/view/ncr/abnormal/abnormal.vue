@@ -78,10 +78,11 @@
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="view" type="primary" link
-                            @click="editApiFunc(scope.row, 'check')">查看</el-button>
-                        <el-button icon="edit" type="primary" link
-                            @click="editApiFunc(scope.row, 'edit')">修改</el-button>
+                        <el-button icon="view" type="primary" link @click="editApiFunc(scope.row, 'check')"
+                            :disabled="scope.row.operation_type === '-1'"> 查看 </el-button>
+                        <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row, 'edit')"
+                            :disabled="scope.row.operation_type === '-1'">
+                            修改</el-button>
                         <!-- <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
                             :disabled="!(scope.row.operation_type != '' && scope.row.operation_type !== '1')">
                             <el-button icon="tools" type="primary" link @click="editApiFunc(scope.row, 'rework')"
@@ -109,17 +110,17 @@
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
                             :disabled="!scope.row.is_ncr">
-                            <el-button icon="remove" type="primary" link @click="editApiFunc(scope.row, 'createNcr')"
-                                :disabled="scope.row.is_ncr">创建ncr</el-button>
+                            <el-button icon="monitor" type="primary" link @click="editApiFunc(scope.row, 'createNcr')"
+                                :disabled="scope.row.is_ncr || scope.row.operation_type === '4' || scope.row.operation_type === '5'">创建ncr</el-button>
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"
                             :disabled="!scope.row.is_ncr">
-                            <el-button icon="remove" type="primary" link @click="editApiFunc(scope.row, 'createNcr')"
-                                :disabled="scope.row.is_ncr">填写方案</el-button>
+                            <el-button icon="edit" type="primary" link
+                                :disabled="scope.row.is_ncr || (scope.row.operation_type === '4' || scope.row.operation_type === '5')"
+                                @click="editApiFunc(scope.row, 'report')">填写方案</el-button>
                         </el-tooltip>
                         <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
-                        <el-button icon="circle-close" type="primary" link
-                            @click="editApiFunc(scope.row)">关闭</el-button>
+                        <el-button icon="circle-close" type="primary" link @click="closeAll(scope.row)">关闭</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -229,25 +230,8 @@
                     <span v-show="isNcr">{{ form.supplier }}</span>
 
                     <el-select v-model="form.supplier" placeholder="供应商" style="width:100%" v-if="isNcrDisabled">
-                        <el-option v-for="item in supplierList" :key="item.name" :label="`${item.genre}`"
+                        <el-option v-for="item in supplierList" :key="item.name" :label="`${item.name}`"
                             :value="item.name" />
-                    </el-select>
-                </el-form-item>
-
-
-                <!-- 通知 -->
-                <el-form-item label="通知部门:" prop="notification_department" style="width:20%">
-                    <el-select v-model="notification_department" placeholder="选择部门" style="width:100%"
-                        v-if="isNcrDisabled" @change="departmentUinfo(notification_department)">
-                        <el-option v-for="item in departmentList" :key="item.authorityName"
-                            :label="`${item.authorityName}`" :value="item.authorityId" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="通知人员:" prop="notification_member" style="width:20%">
-                    <el-select v-model="notification_member" multiple placeholder="选择人员" style="width:100%"
-                        v-if="isNcrDisabled" @change="sentNotice">
-                        <el-option v-for="item in AuthorityUsers" :key="item.ID" :label="`${item.userName}`"
-                            :value="item.userName" />
                     </el-select>
                 </el-form-item>
                 <!-- 异常发现 -->
@@ -303,11 +287,19 @@
                         value-format="YYYY-MM-DDT15:04:05Z" v-if="isNcrDisabled">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="问题描述:" prop="describe" style="width:80%">
-                    <span v-show="isNcr">{{ form.describe }}</span>
-
-                    <el-input type="textarea" placeholder="请输入内容" v-model="form.describe" maxlength="50" show-word-limit
-                        :rows="10" v-if="isNcrDisabled" />
+                <el-form-item label="问题描述:" prop="describe" style="width:80%;">
+                    <!-- <span v-show="isNcr">{{ form.describe }}</span> -->
+                    <!-- <el-input type="textarea" placeholder="请输入内容" v-model="form.describe" maxlength="50" show-word-limit
+                        :rows="10" v-if="isNcrDisabled" /> -->
+                    <div v-if="isNcr">
+                        <QuillEditor :options="editorOptions" content-type="html" ref="quillEditor" theme="snow"
+                            v-model:content="form.describe" :value="form.describe" readOnly />
+                    </div>
+                    <div v-if="isNcrDisabled">
+                        <QuillEditor :options="editorOptions" content-type="html" ref="quillEditor" theme="snow"
+                            v-model:content="form.describe" :value="form.describe" />
+                    </div>
+                    <el-tiptap />
                 </el-form-item>
                 <el-form-item label="标签:" prop="photograph" style="width:100%">
                     <el-image v-show="isNcr" v-for="item in imgList"
@@ -321,6 +313,27 @@
                         <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
                     </el-upload>
                 </el-form-item>
+                <!-- 是否通知其他人 -->
+                <el-form-item label="是否通知其他人:" prop="process_mode" style="width:100%" v-if="isCreateNcr">
+                    <el-switch v-model="notifiy" active-color="#13ce66" inactive-color="#E0E0E0">
+                    </el-switch>
+                </el-form-item>
+                <!-- 通知 -->
+                <div v-if="isEnableNotify">
+                    <el-form-item label="通知部门:" prop="notification_department" style="width:20%">
+                        <el-select v-model="notification_department" placeholder="选择部门" style="width:100%"
+                            @change="departmentUinfo(notification_department)">
+                            <el-option v-for="item in departmentList" :key="item.authorityName"
+                                :label="`${item.authorityName}`" :value="item.authorityId" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="通知人员:" prop="notification_member" style="width:20%">
+                        <el-select v-model="notification_member" multiple placeholder="选择人员" style="width:100%">
+                            <el-option v-for="item in AuthorityUsers" :key="item.ID" :label="`${item.userName}`"
+                                :value="item.userName" />
+                        </el-select>
+                    </el-form-item>
+                </div>
                 <!-- 创建ncr -->
                 <div v-if="isCreateNcr">
                     <el-form-item label="类型:" prop="mold" style="width:30%">
@@ -339,9 +352,9 @@
                                 :value="item.value" />
                         </el-select>
                     </el-form-item>
-
+                    <!-- 具体措施 -->
                     <el-form-item label="具体措施:" prop="process_mode" style="width:100%">
-                        <el-radio-group v-model="form.operation_type" size="medium" @change="switchMode">
+                        <el-radio-group v-model="form.operation_type" size="medium">
                             <el-radio-button label="返工"> </el-radio-button>
                             <el-radio-button label="返修"></el-radio-button>
                             <el-radio-button label="配做"></el-radio-button>
@@ -403,8 +416,12 @@
                 <!-- 配做  -->
                 <div v-if="isParts">
                     <el-form-item label="配做方案" prop="parts_desc" style="width:100%">
-                        <el-input type="textarea" placeholder="请输入内容" v-model="form.parts_desc" maxlength="50"
-                            show-word-limit :rows="10" />
+                        <div>
+                            <QuillEditor :options="editorOptions" content-type="html" ref="quillEditor" theme="snow"
+                                v-model:content="form.parts_desc" :value="form.parts_desc" />
+                        </div>
+                        <!-- <el-input type="textarea" placeholder="请输入内容" v-model="form.parts_desc" maxlength="50"
+                            show-word-limit :rows="10" /> -->
                     </el-form-item>
                     <el-form-item prop="series" label="配做订单">
                         <el-table :data="tablePartsData" border style="width: 100%;" :stripe="true">
@@ -466,13 +483,41 @@ import {
     setPassDate,
     setNcr,
     getUserAuthorityList,
-    sendMessage
+    sendMessage,
+    getUserByNcrID,
+    closeAllByID
 } from '@/api/manage.js'
 import { toSQLLine, formatDate } from '@/utils/stringFun'
-import { ref } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/pinia/modules/user'
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+
 defineOptions({
     name: 'Api',
+})
+const userStore = useUserStore()
+
+const quillEditor = ref();
+
+const editorOptions = reactive({
+    modules: {
+        toolbar: [  // 工具栏配置
+            ['bold', 'italic', 'underline', 'strike'],  // 粗体、斜体、下划线、删除线
+            [{ 'header': 1 }, { 'header': 2 }],  // 标题1和标题2
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],  // 有序列表和无序列表
+            [{ 'script': 'sub' }, { 'script': 'super' }],  // 上标和下标
+            [{ 'indent': '-1' }, { 'indent': '+1' }],  // 缩进
+            [{ 'direction': 'rtl' }],  // 文字方向
+            [{ 'size': ['small', false, 'large', 'huge'] }],  // 字号
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],  // 标题等级
+            [{ 'color': [] }, { 'background': [] }],  // 字体颜色和背景色
+            [{ 'font': [] }],  // 字体
+            [{ 'align': [] }],  // 对齐方式
+            ['clean']  // 清除格式
+        ]
+    }
 })
 const path = import.meta.env.VITE_BASE_PATH + ':' + import.meta.env.VITE_SERVER_PORT + '/'
 const isFormDisabled = ref(true)
@@ -483,48 +528,6 @@ const isRepair = ref(false)
 const isParts = ref(false)
 const isCreateNcr = ref(false)
 const isCNcr = ref(true)
-const methodFilter = (value) => {
-    const target = methodOptions.value.filter(item => item.value === value)[0]
-    return target && `${target.label}`
-}
-
-
-const test = () => {
-    console.log(notification_member.value)
-}
-
-const switchMode = (e) => {
-    isFormDisabled.value = true
-    isNcr.value = true
-    isRework.value = false
-    isRepair.value = false
-    isParts.value = false
-    switch (e) {
-        case '返工':
-            dialogTitle.value = '创建/修改返工订单'
-            isRework.value = true
-            isNcrDisabled.value = false
-            type.value = 'rework'
-            //form.value.operation_type = "1"
-            break
-        case '返修':
-            dialogTitle.value = '创建/修改返修订单'
-            isRepair.value = true
-            isNcrDisabled.value = false
-            type.value = 'repair'
-            // form.value.operation_type = "2"
-            break
-        case '配做':
-            dialogTitle.value = '创建/修改配做订单'
-            isParts.value = true
-            isNcrDisabled.value = false
-            type.value = 'parts'
-            // form.value.operation_type = "3"
-            break
-        default:
-            break;
-    }
-}
 const apis = ref([])
 const departmentList = ref([])
 const genreList1 = ref([])
@@ -583,6 +586,64 @@ const form = ref({
     authority_id: 0,
     departments: ''
 })
+const notifiy = ref(false)
+const isEnableNotify = ref(false)
+watch(
+    () => notifiy.value,
+    () => {
+        if (notifiy.value) {
+            isEnableNotify.value = true
+        } else {
+            isEnableNotify.value = false
+        }
+    }
+)
+
+watch(
+    () => form.value.operation_type,
+    () => {
+        isFormDisabled.value = true
+        isNcr.value = true
+        isRework.value = false
+        isRepair.value = false
+        isParts.value = false
+        switch (form.value.operation_type) {
+            case '返工':
+                dialogTitle.value = '创建/修改返工订单'
+                isRework.value = true
+                isNcrDisabled.value = false
+                type.value = 'rework'
+                break
+            case '返修':
+                dialogTitle.value = '创建/修改返修订单'
+                isRepair.value = true
+                isNcrDisabled.value = false
+                type.value = 'repair'
+                break
+            case '配做':
+                dialogTitle.value = '创建/修改配做订单'
+                isParts.value = true
+                isNcrDisabled.value = false
+                type.value = 'parts'
+                break
+            default:
+                break;
+        }
+    }
+)
+
+
+watch(
+    () => form.value.rework_plan_date,
+    () => {
+        if (form.value.rework_plan_date === '0001-01-01T00:00:00Z') {
+            form.value.rework_plan_date = ''
+        }
+        console.log(form.value.rework_plan_date)
+    }
+)
+
+
 
 const tablePartsData = ref([])
 const addTableData = () => {
@@ -783,8 +844,6 @@ const notification_department = ref('')
 const notification_member = ref('')
 //获取部门用户
 const departmentUinfo = async (Authority) => {
-
-    console.log(Authority)
     const table = await getUserAuthorityList({ page: page.value, pageSize: pageSize.value, authority_id: Authority, ...searchInfo.value })
     if (table.code === 0) {
         console.log(table.data.list)
@@ -852,21 +911,6 @@ const handleSelectionChange = (val) => {
 }
 
 const deleteVisible = ref(false)
-const onDelete = async () => {
-    const ids = apis.value.map(item => item.ID)
-    const res = await deleteApisByIds({ ids })
-    if (res.code === 0) {
-        ElMessage({
-            type: 'success',
-            message: res.msg
-        })
-        if (tableData.value.length === ids.length && page.value > 1) {
-            page.value--
-        }
-        deleteVisible.value = false
-        getTableData()
-    }
-}
 
 // 弹窗相关
 const apiForm = ref(null)
@@ -941,10 +985,28 @@ const openDialog = (key) => {
             dialogTitle.value = '编辑异常'
             isNcr.value = false
             break
+        case 'report':
+            dialogTitle.value = '填写工单'
+            isNcr.value = true
+            isCNcr.value = false
+            isCreateNcr.value = true
+            isFormDisabled.value = true
+            isNcrDisabled.value = false
+            if (form.value.operation_type == '返工') {
+                isRework.value = true
+            }
+            if (form.value.operation_type == '返修') {
+                isRepair.value = true
+            }
+            if (form.value.operation_type == '配做') {
+                isParts.value = true
+            }
+            break
         case 'check':
             dialogTitle.value = '查看NCR'
             isFormDisabled.value = false
             isNcr.value = true
+            isCNcr.value = false
             isNcrDisabled.value = false
             break
         case 'createNcr':
@@ -967,10 +1029,6 @@ const openDialog = (key) => {
         default:
             break
     }
-
-
-
-
     type.value = key
     dialogFormVisible.value = true
 }
@@ -1012,9 +1070,38 @@ const editApiFunc = async (row, operation) => {
         tablePartsData.value = JSON.parse(form.value.series)
     }
 
+    if (operation === 'report') {
+        const res = await getUserByNcrID({ ncr_id: row.ID, reportname: userStore.userInfo.userName })
+        if (res.code !== 0) {
+            return
+        }
+    }
+
+    if (form.value.rework_plan_date === '0001-01-01T00:00:00Z') {
+        form.value.rework_plan_date = ''
+    }
+
+    if (form.value.repair_plan_date === '0001-01-01T00:00:00Z') {
+        form.value.repair_plan_date = ''
+    }
+
+
     openDialog(operation)
 
 }
+
+const closeAll = async (row) => {
+    const res = await closeAllByID({ id: row.ID })
+    if (res.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: 'ncr 流程已关闭',
+            showClose: true
+        })
+    }
+    getTableData()
+}
+
 
 
 const setPassDateFunc = async (row, ot) => {
@@ -1043,11 +1130,11 @@ const setNcrFunc = async (row) => {
     closeDialog()
 }
 
-const sentNotice = async () => {
+const sentNotice = async (id) => {
     console.log(notification_member.value)
     for (let item of notification_member.value) {
         console.log(item)
-        const res = await sendMessage({ message_type: '1', message_link: 'www.baidu.com', message_is_active: true, message_receive_name: item, message_content: '有新不合格品请处理' })
+        const res = await sendMessage({ message_type: '1', message_link: '', message_is_active: true, message_receive_name: item, message_content: '有新通知请处理', ncr_id: id })
 
         console.log(res)
     }
@@ -1057,6 +1144,20 @@ const enterDialog = async () => {
     apiForm.value.validate(async valid => {
         if (tablePartsData.value !== null) {
             form.value.series = JSON.stringify(tablePartsData.value)
+        }
+
+
+        if (form.value.rework_plan_date === '') {
+            form.value.rework_plan_date = '0001-01-01T00:00:00Z'
+        }
+
+        if (form.value.repair_plan_date === '') {
+            form.value.repair_plan_date = '0001-01-01T00:00:00Z'
+        }
+
+
+        if (isEnableNotify.value) {
+            sentNotice(form.value.ID)
         }
 
         if (valid) {
@@ -1145,5 +1246,14 @@ const deleteApiFunc = async (row) => {
         bottom: 10px;
         right: 19px;
     }
+}
+
+:deep(.ql-editor) {
+    min-height: 180px;
+}
+
+:deep(.ql-formats) {
+    height: 21px;
+    line-height: 21px;
 }
 </style>

@@ -158,6 +158,15 @@ export const getUserInfo = () => {
   })
 }
 
+//获取用户
+export const getUserByNcrID = (data) => {
+  return service({
+    url: '/message/getMessageByNcrID',
+    method: 'post',
+    data,
+  })
+}
+
 //获取部门用户
 export const getUserAuthorityList = (data) => {
   return service({
@@ -189,6 +198,16 @@ export const getMessage = (data) => {
 export const setMessageState = (data) => {
   return service({
     url: '/message/setMessageState',
+    method: 'post',
+    data: data
+  })
+}
+
+
+//获取部门用户
+export const closeAllByID = (data) => {
+  return service({
+    url: '/manage/closeAllById',
     method: 'post',
     data: data
   })

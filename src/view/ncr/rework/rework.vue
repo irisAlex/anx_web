@@ -35,8 +35,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="计划时间">
-                    <el-date-picker v-model="value" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-                        :default-time="['00:00:00', '23:59:59']">
+                    <el-date-picker v-model="searchInfo.rework_plan_date" type="date" placeholder="计划时间"
+                        value-format="YYYY-MM-DDT15:04:05Z">
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
@@ -89,7 +89,8 @@
                 <template #default="scope">
                     <el-button icon="check" type="primary" link @click="setApiFunc(scope.row, '1')">同意</el-button>
                     <el-button icon="remove" type="primary" link @click="setApiFunc(scope.row, '-1')">拒绝</el-button>
-                    <el-button icon="view" type="primary" link @click="editApiFunc(scope.row)">查看</el-button>
+                    <el-button icon="view" type="primary" link @click="editApiFunc(scope.row, 'look')">查看</el-button>
+                    <el-button icon="view" type="primary" link @click="editApiFunc(scope.row, 'modify')">修改</el-button>
                     <el-button icon="printer" type="primary" link @click="">打印</el-button>
                 </template>
             </el-table-column>
@@ -101,97 +102,54 @@
         </div>
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="40%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
-                <el-form-item label="编号" prop="method" style="width:30%">
-                    <span>
-                        {{ form.serialnumber }}
-                    </span>
+                <el-form-item label="数量" prop="rework_number" style="width:20%">
+                    <span v-if="!isModfiy">{{ form.rework_number }}</span>
+                    <el-input placeholder="数量" size="mini" v-model.number="form.rework_number" v-if="isModfiy" />
                 </el-form-item>
-                <el-form-item label="受检物名称" prop="checkout_name" style="width:30%">
-                    <span>{{ form.checkout_name }}</span>
+                <el-form-item label="工时" prop="rework_man_hour" style="width: 20%">
+                    <span v-if="!isModfiy">{{ form.rework_man_hour }}</span>
+                    <el-input placeholder="工时" size="mini" v-model.number="form.rework_man_hour" v-if="isModfiy" />
                 </el-form-item>
-                <el-form-item label="受检物号" prop="checkout_number" style="width:30%">
-                    <span>
-                        {{ form.checkout_number }}
-                    </span>
+                <el-form-item label="工料" prop="rework_quantities" style="width:20%">
+                    <span v-if="!isModfiy">{{ form.rework_quantities }}</span>
+                    <el-input placeholder="工料" size="mini" v-model="form.rework_quantities" v-if="isModfiy" />
                 </el-form-item>
-                <el-form-item label="类别" prop="category" style="width:30%">
-                    <span>
-                        {{ form.category }}
-                    </span>
-                </el-form-item>
-                <el-form-item label="部门" prop="department" style="width:30%">
-                    <span>
-                        {{ form.department }}
-                    </span>
-                </el-form-item>
-                <el-form-item label="项目" prop="project" style="width:30%">
-                    <span>
-                        {{ form.project }}
-                    </span>
-                </el-form-item>
-                <el-form-item label="数量" prop="rework_number" style="width:30%">
-                    <span>
-                        {{ form.rework_number }}
-                    </span>
-                </el-form-item>
+                <el-form-item label="工序" prop="rework_process" style="width:20%">
+                    <span v-if="!isModfiy">{{ form.rework_process }}</span>
 
-                <el-form-item label="工时" prop="rework_man_hour" style="width:30%">
-                    <span>
-                        {{ form.rework_man_hour }}
-                    </span>
+                    <el-input placeholder="工序" size="mini" v-model="form.rework_process" v-if="isModfiy" />
                 </el-form-item>
+                <el-form-item label="返工计划完成时间" prop="rework_plan_date" style="width:40%">
+                    <span v-if="!isModfiy">{{ formatDate(form.rework_plan_date) }}</span>
 
-                <el-form-item label="工料" prop="rework_man_hour" style="width:30%">
-                    <span>
-                        {{ form.rework_quantities }}
-                    </span>
+                    <el-date-picker v-model="form.rework_plan_date" type="date" placeholder="选择日期"
+                        value-format="YYYY-MM-DDT15:04:05Z" v-if="isModfiy">
+                    </el-date-picker>
                 </el-form-item>
-                <el-form-item label="工序" prop="rework_man_hour" style="width:30%">
-                    <span>
-                        {{ form.rework_process }}
-                    </span>
-                </el-form-item>
+                <el-form-item label="返工描述" prop="rework_desc" style="width:100%">
+                    <span v-if="!isModfiy">{{ form.rework_man_hour }}</span>
 
-
-                <el-form-item label="处理方式" prop="process_mode" style="width:30%">
-                    <span>
-                        {{ form.process_mode }}
-                    </span>
+                    <el-input type="textarea" placeholder="请输入内容" v-model="form.rework_desc" maxlength="50"
+                        show-word-limit :rows="10" v-if="isModfiy" />
                 </el-form-item>
-                <el-form-item label="类型" prop="category" style="width:30%">
-                    <span>
-                        {{ form.mold }}
-                    </span>
-                </el-form-item>
-                <el-form-item label="状态" prop="status" style="width:30%">
-                    <template #default="scope">
-                        <div slot="reference" class="name-wrapper">
-                            <el-tag :type="form.status === '1' ? 'success' : form.status === '-1' ? 'danger' : 'info'"
-                                disable-transitions>{{
-                                    form.status === '1' ? '同意' : form.status === '-1' ? '拒绝' : '待处理'
-                                }}</el-tag>
-                        </div>
-                    </template>
-                </el-form-item>
-                <el-form-item label="计划时间" prop="rework_plan_date" style="width:30%">
-                    <span>
-                        {{ formatDate(form.rework_plan_date) }}
-                    </span>
-                </el-form-item>
-                <el-form-item label="照片" prop="rework_attachment" style="width:30%">
+                <el-form-item label="返工证据" prop="rework_attachment" style="width:100%">
                     <el-image v-for="item in imgList"
                         style="width: 100px; height: 100px;display: block;margin: 5px;box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);"
-                        :src="path + item.url" :preview-src-list="[path + item.url]">
+                        :src="path + item.url" :preview-src-list="[path + item.url]" v-if="!isModfiy">
                     </el-image>
+                    <el-upload action="/api/fileUploadAndDownload/upload" multiple :limit="2" :file-list="fileList1"
+                        :on-success="handleSuccess1" show-file-list="false" :on-remove="handleRemove1" v-if="isModfiy">
+                        <el-button size="small" type="primary">点击上传</el-button>
+                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                    </el-upload>
                 </el-form-item>
-
             </el-form>
-            <!-- <template #footer>
+            <template #footer>
                 <div class="dialog-footer">
-                    <el-button @click="closeDialog" v-if="isFormDisabled">取 消</el-button>
-                    <el-button type="primary" @click="enterDialog" v-if="isFormDisabled">确 定</el-button>
+                    <el-button @click="closeDialog" v-if="isModfiy">取 消</el-button>
+                    <el-button type="primary" @click="enterDialog" v-if="isModfiy">确 定</el-button>
                 </div>
-            </template> -->
+            </template>
         </el-dialog>
     </div>
 
@@ -206,6 +164,7 @@ import {
     setStatus,
     getManageList,
     getManageById,
+    updateManage
 } from '@/api/manage.js'
 
 import { toSQLLine, formatDate } from '@/utils/stringFun'
@@ -221,6 +180,37 @@ const methodFilter = (value) => {
     return target && `${target.label}`
 }
 
+//返工图片处理
+const handleSuccess1 = (resp) => {
+    if (resp.code === 0) {
+        ElMessage({
+            type: 'success',
+            message: '图片上传成功',
+            showClose: true
+        })
+
+        fileList1.value.push({ name: resp.data.file.name, url: resp.data.file.url })
+        form.value.rework_attachment = JSON.stringify(fileList1.value)
+        return
+    }
+    ElMessage({
+        type: 'error',
+        message: '图片上传失败',
+        showClose: true
+    })
+
+};
+
+const handleRemove1 = (file, fileList1) => {
+    // 处理删除文件的逻辑，例如从文件列表中删除文件
+    const index = fileList1.indexOf(file);
+    if (index !== -1) {
+        fileList.splice(index, 1);
+    }
+    form.value.rework_attachment = JSON.stringify(fileList1.value)
+};
+
+const isModfiy = ref(false)
 const path = import.meta.env.VITE_BASE_PATH + ':' + import.meta.env.VITE_SERVER_PORT + '/'
 const apis = ref([])
 const form = ref({
@@ -425,6 +415,11 @@ const openDialog = (key) => {
     switch (key) {
         case 'look':
             dialogTitle.value = '查看返工'
+            isModfiy.value = false
+            break
+        case 'modify':
+            isModfiy.value = true
+            dialogTitle.value = '修改返工'
             break
         default:
             break
@@ -437,13 +432,19 @@ const closeDialog = () => {
     dialogFormVisible.value = false
 }
 
+const fileList1 = ref([])
+
 const imgList = ref([])
 
-const editApiFunc = async (row) => {
+const editApiFunc = async (row, operation) => {
     const res = await getManageById({ id: row.ID })
     form.value = res.data.manage
-    imgList.value = JSON.parse(form.value.rework_attachment)
-    openDialog('look')
+    if (form.value.rework_attachment !== '') {
+        fileList1.value = JSON.parse(form.value.rework_attachment)
+        imgList.value = JSON.parse(form.value.rework_attachment)
+    }
+
+    openDialog(operation)
 }
 
 
@@ -457,6 +458,39 @@ const setApiFunc = async (row, status) => {
         })
     }
     getTableData()
+}
+
+
+const enterDialog = async () => {
+    apiForm.value.validate(async valid => {
+        if (valid) {
+            switch (type.value) {
+                case 'modify':
+                    {
+                        const res = await updateManage(form.value)
+                        if (res.code === 0) {
+                            ElMessage({
+                                type: 'success',
+                                message: '编辑成功',
+                                showClose: true
+                            })
+                        }
+                        getTableData()
+                        closeDialog()
+                    }
+                    break
+                default:
+                    {
+                        ElMessage({
+                            type: 'error',
+                            message: '未知操作',
+                            showClose: true
+                        })
+                    }
+                    break
+            }
+        }
+    })
 }
 
 </script>
