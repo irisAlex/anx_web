@@ -440,7 +440,7 @@ const editApiFunc = async (row, operation) => {
     form.value = res.data.manage
     if (form.value.repair_attachment !== '') {
         imgList.value = JSON.parse(form.value.repair_attachment)
-        fileList = JSON.parse(form.value.repair_attachment)
+        fileList.value = JSON.parse(form.value.repair_attachment)
     }
 
     openDialog(operation)
