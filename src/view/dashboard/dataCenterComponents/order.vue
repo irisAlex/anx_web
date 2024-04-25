@@ -4,20 +4,20 @@
 
     <div class="ReclaimMileage-box-data">
       <div class="ReclaimMileage-box-data-left" style="margin-right: 50px;">
-        <div>返工订单</div>
+        <div>返工</div>
         <div class="number">{{ rework.length }} </div>
         <!-- <div>昨日:7902</div> -->
       </div>
       <div class="ReclaimMileage-box-data-left" style="margin-right: 40px;">
-        <div>返修订单</div>
+        <div>返修</div>
         <div class="number">{{ repair.length }} </div>
       </div>
       <div class="ReclaimMileage-box-data-left">
-        <div>让步放行</div>
+        <div>让步</div>
         <div class="number">{{ pass.length }} </div>
       </div>
       <div class="ReclaimMileage-box-data-left" style="margin-left: 30px;">
-        <div>配做订单</div>
+        <div>配做</div>
         <div class="number">{{ parts.length }}</div>
       </div>
     </div>

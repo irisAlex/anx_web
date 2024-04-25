@@ -30,7 +30,8 @@ function drawCircle() {
     ctx.beginPath();
     switch (number) {
         case 1:
-            ctx.arc(x, y, RADIUS, Math.PI / 2, Math.PI * 1); //sAngle 90 ,eAngle 180    ctx.fillStyle = '#333';
+            console.log(333333)
+            ctx.arc(x, y, RADIUS, Math.PI / 2, Math.PI); //sAngle 90 ,eAngle 180    ctx.fillStyle = '#333';
             break;
         case 2:
             ctx.arc(x, y, RADIUS, Math.PI / 2, Math.PI * 1.5); //sAngle 90 ,eAngle 180    ctx.fillStyle = '#333';
@@ -54,9 +55,8 @@ function handleClick() {
     number++
     circle.value = number
     if (number > 4) {
-        number = 4
+        number = 1
         circle.value = number
-        return
     }
     drawCircle();
 

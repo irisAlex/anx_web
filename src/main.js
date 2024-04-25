@@ -14,7 +14,6 @@ import auth from '@/directive/auth'
 import { store } from '@/pinia'
 import App from './App.vue'
 import { initDom } from './utils/positionToCode'
-import Antd from 'ant-design-vue'
 initDom()
 /**
  * @description 导入加载进度条，防止首屏加载时间过长，用户等待
@@ -31,13 +30,11 @@ Nprogress.start()
 
 const app = createApp(App)
 app.config.productionTip = false
-
 app
   .use(run)
   .use(store)
   .use(auth)
   .use(router)
-  .use(Antd)
   .mount('#app')
 
 export default app

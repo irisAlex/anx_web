@@ -2,42 +2,42 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门" style="width:10%" prop="method">
+                <el-form-item label="部门" style="width:200px" prop="method">
                     <el-select v-model="searchInfo.department" placeholder="选择部门">
                         <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
                             :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型" style="width:10%" prop="method">
+                <el-form-item label="类型" style="width:200px" prop="method">
                     <el-select v-model="searchInfo.mold" placeholder="请选择">
                         <el-option v-for="item in moldList" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别" prop="method" style="width:10%">
+                <el-form-item label="类别" prop="method" style="width:200px">
                     <el-select v-model="searchInfo.category" placeholder="请选择">
                         <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称" prop="method" style="width:10%">
+                <el-form-item label="受检物名称" prop="method" style="width:200px">
                     <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
-                <el-form-item label="受检物号" prop="method" style="width:10%">
+                <el-form-item label="受检物号" prop="method" style="width:200px">
                     <el-input v-model="searchInfo.checkout_name" placeholder="受检物号" />
                 </el-form-item>
-                <el-form-item label="处理方式" prop="method" style="width:10%">
+                <el-form-item label="处理方式" prop="method" style="width:200px">
                     <el-select v-model="searchInfo.process_mode" placeholder="请选择">
                         <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
                             :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="项目名称" prop="project" style="width:10%">
+                <el-form-item label="项目名称" prop="project" style="width:200px">
                     <el-input v-model="searchInfo.project" placeholder="项目名称" />
                 </el-form-item>
-                <el-form-item label="填表日期" prop="checkout_date" style="width:10%">
+                <el-form-item label="填表日期" prop="checkout_date" style="width:200px">
                     <el-date-picker v-model="searchInfo.created_at" type="date" placeholder="选择日期"
                         value-format="YYYY-MM-DDT15:04:05Z">
                     </el-date-picker>
@@ -78,8 +78,8 @@
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="view" type="primary" link @click="editApiFunc(scope.row, 'check')"
-                            :disabled="scope.row.operation_type === '-1'"> 查看 </el-button>
+                        <el-button icon="view" type="primary" link @click="editApiFunc(scope.row, 'check')"> 查看
+                        </el-button>
                         <el-button icon="edit" type="primary" link @click="editApiFunc(scope.row, 'edit')"
                             :disabled="scope.row.operation_type === '-1'">
                             修改</el-button>
@@ -119,8 +119,12 @@
                                 :disabled="scope.row.is_ncr || (scope.row.operation_type === '4' || scope.row.operation_type === '5')"
                                 @click="editApiFunc(scope.row, 'report')">填写方案</el-button>
                         </el-tooltip>
-                        <el-button icon="delete" type="primary" link @click="deleteApiFunc(scope.row)">删除</el-button>
-                        <el-button icon="circle-close" type="primary" link @click="closeAll(scope.row)">关闭</el-button>
+                        <el-tooltip class="item" effect="dark" content="当前操作不被允许" placement="top-end"><el-button
+                                icon="delete" type="primary" link @click="deleteApiFunc(scope.row)"
+                                :disabled="scope.row.operation_type === '-1'">删除</el-button>
+                        </el-tooltip>
+                        <el-button icon="circle-close" type="primary" link
+                            @click="closeAll(scope.row)">NCR关闭</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -135,10 +139,10 @@
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="80%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
                 <el-form-item label="编号:" prop="serialnumber" style="width:20%">
-                    <p v-show="isNcr">{{ form.serialnumber }}</p>
+                    <p v-if="isNcr">{{ form.serialnumber }}</p>
                     <el-input placeholder="编号" size="mini" v-model="form.serialnumber" v-if="isNcrDisabled" />
                 </el-form-item>
-                <el-form-item label="部门:" prop="department" style="width:20%">
+                <el-form-item label="发现部门:" prop="department" style="width:20%">
                     <span v-show="isNcr">{{ form.department }}</span>
 
                     <el-select v-model="form.department" placeholder="北京安新" style="width:100%" v-if="isNcrDisabled">
@@ -224,7 +228,16 @@
                 <el-form-item label="责任部门:" prop="duty_department" style="width:20%">
                     <span v-show="isNcr">{{ form.duty_department }}</span>
 
-                    <el-input placeholder="责任部门" size="mini" v-model="form.duty_department" v-if="isNcrDisabled" />
+                    <el-select v-model="form.duty_department" placeholder="北京安新" style="width:100%"
+                        v-if="isNcrDisabled">
+                        <el-option v-for="item in departmentList" :key="item.authorityName"
+                            :label="`${item.authorityName}`" :value="item.authorityName" />
+                    </el-select>
+
+
+                    <!-- <span v-show="isNcr">{{ form.duty_department }}</span> -->
+
+                    <!-- <el-input placeholder="责任部门" size="mini" v-model="form.duty_department" v-if="isNcrDisabled" /> -->
                 </el-form-item>
                 <el-form-item label="供应商:" prop="supplier" style="width:20%">
                     <span v-show="isNcr">{{ form.supplier }}</span>
@@ -299,7 +312,6 @@
                         <QuillEditor :options="editorOptions" content-type="html" ref="quillEditor" theme="snow"
                             v-model:content="form.describe" :value="form.describe" />
                     </div>
-                    <el-tiptap />
                 </el-form-item>
                 <el-form-item label="标签:" prop="photograph" style="width:100%">
                     <el-image v-show="isNcr" v-for="item in imgList"
@@ -461,7 +473,8 @@
             <template #footer>
                 <div class="dialog-footer">
                     <el-button @click="closeDialog" v-if="isFormDisabled">取 消</el-button>
-                    <el-button type="primary" @click="enterDialog" v-if="isFormDisabled">提交草稿</el-button>
+                    <el-button type="primary" @click="enterDialog" v-if="isFormDisabled">{{ buttonName
+                        }}</el-button>
                     <el-button type="primary" @click="setNcrFunc" v-if="isCNcr">创建NCR</el-button>
                 </div>
             </template>
@@ -487,9 +500,10 @@ import {
     getUserByNcrID,
     closeAllByID
 } from '@/api/manage.js'
-import { toSQLLine, formatDate } from '@/utils/stringFun'
 import { ref, reactive, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { toSQLLine, formatDate } from '@/utils/stringFun'
+
 import { useUserStore } from '@/pinia/modules/user'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -498,7 +512,7 @@ defineOptions({
     name: 'Api',
 })
 const userStore = useUserStore()
-
+const buttonName = ref('提交')
 const quillEditor = ref();
 
 const editorOptions = reactive({
@@ -602,6 +616,9 @@ watch(
 watch(
     () => form.value.operation_type,
     () => {
+        if (type.value === 'edit') {
+            return
+        }
         isFormDisabled.value = true
         isNcr.value = true
         isRework.value = false
@@ -639,7 +656,6 @@ watch(
         if (form.value.rework_plan_date === '0001-01-01T00:00:00Z') {
             form.value.rework_plan_date = ''
         }
-        console.log(form.value.rework_plan_date)
     }
 )
 
@@ -894,7 +910,7 @@ project()
 
 // 查询
 const getTableData = async () => {
-    const table = await getManageList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getManageList({ page: page.value, pageSize: pageSize.value, orderKey: 'id', desc: true, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -983,7 +999,11 @@ const openDialog = (key) => {
             break
         case 'edit':
             dialogTitle.value = '编辑异常'
+            buttonName.value = '提交'
             isNcr.value = false
+            isNcrDisabled.value = true
+            isCNcr.value = false
+            isFormDisabled.value = true
             break
         case 'report':
             dialogTitle.value = '填写工单'
@@ -1010,6 +1030,7 @@ const openDialog = (key) => {
             isNcrDisabled.value = false
             break
         case 'createNcr':
+            buttonName.value = '保存草稿'
             dialogTitle.value = '创建NCR'
             isNcrDisabled.value = false
             isFormDisabled.value = true

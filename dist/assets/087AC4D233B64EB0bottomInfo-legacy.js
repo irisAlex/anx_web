@@ -1,0 +1,4 @@
+/*! 
+ Build based on gin-vue-admin 
+ Time : 1713878256000 */
+System.register(["./087AC4D233B64EB0index-legacy.js"],(function(e,t){"use strict";var n,r,o,a;return{setters:[function(e){n=e.o,r=e.c,o=e.H,a=e.b}],execute:function(){var t={class:"flex gap-4 items-center text-sm text-gray-500 justify-center mb-4"},s=a("span",null,"Powered by",-1),f=a("span",null,[a("a",{class:"text-gray-800 font-bold",href:"#"},"anx")],-1),c=a("span",null,"Copyright",-1),l=a("span",null,[a("a",{class:"text-gray-800 font-bold",href:"#"},"anx团队")],-1);e("default",Object.assign({name:"BottomInfo"},{__name:"bottomInfo",setup:function(e){return console.log("%c powered by %c flipped-aurorae %c","background:#0081ff; padding: 1px; border-radius: 3px 0 0 3px; color: #fff","background:#354855; padding: 1px 5px; border-radius: 0 3px 3px 0; color: #fff; font-weight: bold;","background:transparent"),function(e,a){return n(),r("div",t,[s,f,o(e.$slots,"default"),c,l])}}}))}}}));

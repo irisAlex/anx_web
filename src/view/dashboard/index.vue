@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="data-center-box">
-      <CenterCard title="不合格品总计">
+      <CenterCard title="NCR数量">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -9,7 +9,7 @@
           <ChainRatio />
         </template>
       </CenterCard>
-      <CenterCard title="不合格部门数">
+      <CenterCard title="异常发现数">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>
@@ -17,7 +17,7 @@
           <ReclaimMileage />
         </template>
       </CenterCard>
-      <CenterCard title="不合格品分类">
+      <CenterCard title="分类统计">
         <template #action>
           <span class="gvaIcon-prompt" style="color: #999" />
         </template>

@@ -2,7 +2,7 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门" style="width:10%" prop="method">
+                <el-form-item label="部门" style="width:150px" prop="method">
                     <el-select v-model="searchInfo.department" placeholder="选择部门">
                         <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
                             :value="item.authorityName">

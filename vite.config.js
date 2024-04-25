@@ -14,7 +14,6 @@ import fullImportPlugin from './vitePlugin/fullImport/fullImport.js'
 import { svgBuilder } from './vitePlugin/svgIcon/svgIcon.js'
 // @see https://cn.vitejs.dev/config/
 export default ({
-  command,
   mode
 }) => {
   const NODE_ENV = mode || 'development'
@@ -90,7 +89,7 @@ export default ({
       vuePlugin(),
       svgBuilder('./src/assets/icons/'),
       [Banner(`\n Build based on gin-vue-admin \n Time : ${timestamp}`)]
-    ],
+        ],
     css: {
       preprocessorOptions: {
         scss: {

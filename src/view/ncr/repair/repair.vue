@@ -2,39 +2,39 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门" style="width:10%">
+                <el-form-item label="部门" style="width:200px;">
                     <el-select v-model="searchInfo.department" placeholder="北京安新">
                         <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
                             :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型" style="width:10%">
+                <el-form-item label="类型" style="width:200px;">
                     <el-select v-model="searchInfo.mold" placeholder="请选择">
                         <el-option v-for="item in moldList" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别" style="width:10%">
+                <el-form-item label="类别" style="width:200px;">
                     <el-select v-model="searchInfo.category" placeholder="请选择">
                         <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称" style="width:10%">
+                <el-form-item label="受检物名称" style="width:200px;">
                     <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
-                <el-form-item label="受检物号" style="width:10%">
+                <el-form-item label="受检物号" style="width:200px;">
                     <el-input v-model="searchInfo.checkout_number" placeholder="受检物号" />
                 </el-form-item>
-                <el-form-item label="处理方式" style="width:10%">
+                <el-form-item label="处理方式" style="width:200px;">
                     <el-select v-model="searchInfo.process_mode" placeholder="请选择">
                         <el-option v-for="item in methodOptions" :key="item.value" :label="item.label"
                             :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="计划时间" style="width:10%">
+                <el-form-item label="计划时间" style="width:200px;">
                     <el-date-picker v-model="searchInfo.repair_plan_date" type="date" placeholder="计划时间"
                         value-format="YYYY-MM-DDT15:04:05Z">
                     </el-date-picker>
@@ -345,7 +345,7 @@ const operation = ref("返修")
 // 查询
 const getTableData = async () => {
     //searchInfo.value.op = '2'
-    const table = await getManageList({ page: page.value, pageSize: pageSize.value, keyword: operation.value, ...searchInfo.value })
+    const table = await getManageList({ page: page.value, pageSize: pageSize.value, keyword: operation.value, orderKey: 'id', desc: true, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total

@@ -43,7 +43,7 @@
             </div>
 
         </div>
-
+        <!-- 
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle" width="30%">
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
                 <el-form-item label="供应商名称" prop="name" style="width:100%">
@@ -71,7 +71,7 @@
                     <el-button type="primary" @click="enterDialog">确 定</el-button>
                 </div>
             </template>
-        </el-dialog>
+        </el-dialog> -->
     </div>
 </template>
 

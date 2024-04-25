@@ -2,32 +2,32 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门" style="width:10%" prop="method">
+                <el-form-item label="部门" style="width:200px;" prop="method">
                     <el-select v-model="searchInfo.department" placeholder="选择部门">
                         <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
                             :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类型" style="width:10%" prop="method">
+                <el-form-item label="类型" style="width:200px;" prop="method">
                     <el-select v-model="searchInfo.mold" placeholder="请选择">
                         <el-option v-for="item in moldList" :key="item.value" :label="item.label" :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别" prop="method" style="width:10%">
+                <el-form-item label="类别" prop="method" style="width:200px;">
                     <el-select v-model="searchInfo.category" placeholder="请选择">
                         <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称" prop="method" style="width:10%">
+                <el-form-item label="受检物名称" prop="method" style="width:200px;">
                     <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
-                <el-form-item label="供应商名称" prop="method" style="width:10%">
+                <el-form-item label="供应商名称" prop="method" style="width:200px;">
                     <el-input v-model="searchInfo.supplier" placeholder="供应商名称" />
                 </el-form-item>
-                <el-form-item label="项目名称" prop="project" style="width:10%">
+                <el-form-item label="项目名称" prop="project" style="width:200px;">
                     <el-input v-model="searchInfo.project" placeholder="项目名称" />
                 </el-form-item>
                 <el-form-item>
@@ -73,8 +73,7 @@
 
                 <el-table-column align="left" fixed="right" label="操作" width="300">
                     <template #default="scope">
-                        <el-button icon="download" type="primary" link
-                            @click="editApiFunc(scope.row, 'check')">下载</el-button>
+                        <el-button icon="download" type="primary" link @click="downExcel(scope.row)">下载</el-button>
                         <el-button type="primary" icon="setting" link @click="openDialog(scope.row, 'setting')">
                             配置
                         </el-button>
@@ -130,7 +129,11 @@
                                 </el-form-item>
 
                                 <el-form-item label="问题描述:" prop="describe" style="width:100%">
-                                    <span>{{ form.describe }}</span>
+                                    <div>
+                                        <QuillEditor :options="editorOptions" content-type="html" ref="quillEditor"
+                                            theme="snow" v-model:content="form.describe" :value="form.describe"
+                                            readOnly />
+                                    </div>
                                 </el-form-item>
                                 <el-form-item label="组长:" prop="describe" style="width:40%">
                                     <el-input v-model="form.a3_team_top" @input='handleChange(1)'></el-input>
@@ -204,7 +207,8 @@
                         </el-timeline-item>
                         <el-timeline-item timestamp="4.原因分析" placement="top" :class="isDisabled4" v-if="isShow4">
                             <el-card>
-                                <FishBone :height="400" @click-node="onClickNode" :id="20" />
+                                <FishBone :height="500" @click-node="onClickNode" :id="ID" @issues="onIssues"
+                                    @reduceIssue="onReduceIssue" :step="setp" />
                             </el-card>
                         </el-timeline-item>
                         <el-timeline-item timestamp="5.根本原因确认" placement="top" :class="isDisabled5" v-if="isShow5">
@@ -215,21 +219,12 @@
                                             <span>why?</span>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column label="1.为什么会发生这个问题？" align="center" min-width="150"
+                                    <el-table-column v-for="(issue, index) in Issues" :key="index"
+                                        :label="(index + 1) + '.' + issue.name + '?'" align="center" min-width="150"
                                         prop="product_name">
                                         <template #default="scope">
-                                            <el-input v-model="scope.row.whyIssue" @input='handleChange(5)'></el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="2.为什么没有发现序列问题？" align="center" min-width="150"
-                                        prop="product_name">
-                                        <template #default="scope">
-                                            <el-input v-model="scope.row.sIssue" @input='handleChange(5)'></el-input>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column label="3.为什么产品检验没有发现粗糙度问题" min-width="150" prop="w_serialnumber">
-                                        <template #default="scope">
-                                            <el-input v-model="scope.row.cIssue" @input='handleChange(5)'></el-input>
+                                            <el-input v-model="scope.row[scope.$index + index]"
+                                                @input='handleChange(5)'></el-input>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -428,8 +423,6 @@
             </template>
         </el-drawer>
     </div>
-
-
 </template>
 <script setup>
 import {
@@ -439,15 +432,38 @@ import {
     getProjectList,
     updateManage,
     getManageById,
-    getManageList
+    getManageList,
+    downFile
 } from '@/api/manage.js'
 import { toSQLLine, formatDate } from '@/utils/stringFun'
-import { ref, watch } from 'vue'
+import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { strToJson } from '@/utils/format'
 import FishBone from '@/components/fishBone/index.vue'
 import { useUserStore } from '@/pinia/modules/user'
 import Cri from '@/components/circle/index.vue'
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+const quillEditor = ref();
+
+const editorOptions = reactive({
+    modules: {
+        toolbar: [  // 工具栏配置
+            ['bold', 'italic', 'underline', 'strike'],  // 粗体、斜体、下划线、删除线
+            [{ 'header': 1 }, { 'header': 2 }],  // 标题1和标题2
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],  // 有序列表和无序列表
+            [{ 'script': 'sub' }, { 'script': 'super' }],  // 上标和下标
+            [{ 'indent': '-1' }, { 'indent': '+1' }],  // 缩进
+            [{ 'direction': 'rtl' }],  // 文字方向
+            [{ 'size': ['small', false, 'large', 'huge'] }],  // 字号
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],  // 标题等级
+            [{ 'color': [] }, { 'background': [] }],  // 字体颜色和背景色
+            [{ 'font': [] }],  // 字体
+            [{ 'align': [] }],  // 对齐方式
+            ['clean']  // 清除格式
+        ]
+    }
+})
 
 defineOptions({
     name: 'Setting',
@@ -458,7 +474,6 @@ const stateAdd = () => {
     return cir.value = 1.5
 }
 
-const percentage = ref(0)
 const dialogFormVisible = ref(false)
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
@@ -472,7 +487,7 @@ const handlePictureCardPreview = (file) => {
 
 const drawer = ref(false)
 const direction = ref('rtl')
-const ize = ref('50%')
+const ize = ref('70%')
 const isShowReport = ref(false)
 const dialogTitle = ref('A3配置')
 const openDialog = (row, key) => {
@@ -491,25 +506,37 @@ const openDialog = (row, key) => {
     showSettingDrawer(key, row)
 }
 
-
 function onClickNode(data) {
     form.value.a3_affirm = JSON.stringify(data)
+    setp.value = 4
 }
 
-function onClickCircle(data) {
-    console.log(data)
+const Issues = ref([])
+function onIssues(data) {
+    Issues.value.push(data)
 }
+
+
+function onReduceIssue(data) {
+    const target = Issues.value.findIndex(item => {
+        return item.name === data
+    })
+    Issues.value.splice(target, 1)
+}
+
 
 const handleClose = () => {
     initForm()
     initDraw()
     drawer.value = false
 }
-
+const ID = ref(1)
 const showSettingDrawer = async (key, row) => {
     const res = await getManageById({ id: row.ID })
+    ID.value = row.ID
     if (res.code === 0) {
         form.value = res.data.manage
+
         tableIssueData.value = strToJson(form.value.a3_issue_desc, tableIssueData.value)
         tableCauseData.value = strToJson(form.value.a3_cause, tableCauseData.value)
         tableResultData.value = strToJson(form.value.a3_result, tableResultData.value)
@@ -518,6 +545,7 @@ const showSettingDrawer = async (key, row) => {
         tableEndData.value = strToJson(form.value.a3_end, tableEndData.value)
         tableDeliveryData.value = strToJson(form.value.a3_verify, tableDeliveryData.value)
         configure.value = strToJson(form.value.a3_setting, configure.value)
+        Issues.value = form.value.a3_issues === '' ? [] : JSON.parse(form.value.a3_issues)
         setp.value = form.value.a3_step
     }
     if (form.value.a3_setting == '' && key !== 'setting') {
@@ -531,6 +559,13 @@ const showSettingDrawer = async (key, row) => {
     permissionProcess()
     drawer.value = true
 }
+const path = import.meta.env.VITE_BASE_PATH + ':' + import.meta.env.VITE_SERVER_PORT + '/'
+
+const downExcel = async (row) => {
+    const res = await downFile({ id: row.ID })
+    window.open(path + "uploads/file/" + row.serialnumber + "_A3.xlsx")
+}
+
 const isDisabled9 = ref('disabled')
 const isDisabled1 = ref('disabled')
 const isDisabled2 = ref('disabled')
@@ -616,31 +651,11 @@ const initDraw = () => {
 
 
     tableCauseData.value = ([
-        {
-            whyIssue: "",
-            cIssue: "",
-            sIssue: ""
-        },
-        {
-            whyIssue: "",
-            cIssue: "",
-            sIssue: ""
-        },
-        {
-            whyIssue: "",
-            cIssue: "",
-            sIssue: ""
-        },
-        {
-            whyIssue: "",
-            cIssue: "",
-            sIssue: ""
-        },
-        {
-            whyIssue: "",
-            cIssue: "",
-            sIssue: ""
-        }
+        {},
+        {},
+        {},
+        {},
+        {}
     ])
     tableIssueData.value = ([{
         describe: "(what)这是什么问题？",
@@ -895,10 +910,7 @@ const tableEndData = ref([
 
 const addTableData = (row) => {
     const newRow = {
-        product_serialnumber: null,
-        product_name: null,
-        w_serialnumber: null,
-        w_name: null
+        state: 1
     }
 
     switch (row) {
@@ -941,29 +953,19 @@ const tableCorrectData = ref([
 
 const tableCauseData = ref([
     {
-        whyIssue: "",
-        cIssue: "",
-        sIssue: ""
+
     },
     {
-        whyIssue: "",
-        cIssue: "",
-        sIssue: ""
+
     },
     {
-        whyIssue: "",
-        cIssue: "",
-        sIssue: ""
+
     },
     {
-        whyIssue: "",
-        cIssue: "",
-        sIssue: ""
+
     },
     {
-        whyIssue: "",
-        cIssue: "",
-        sIssue: ""
+
     }
 ])
 
@@ -1034,7 +1036,6 @@ const configure = ref([
     }
 ])
 
-const path = import.meta.env.VITE_BASE_PATH + ':' + import.meta.env.VITE_SERVER_PORT + '/'
 const apis = ref([])
 const departmentList = ref([])
 const genreList1 = ref([])
@@ -1098,7 +1099,8 @@ const form = ref({
     a3_result: "",
     a3_end: "",
     a3_setting: "",
-    a3_step: 0
+    a3_step: 0,
+    a3_issues: ''
 })
 
 
@@ -1273,7 +1275,7 @@ project()
 // 查询
 const getTableData = async () => {
     searchInfo.value.process_mode = "A3"
-    const table = await getManageList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    const table = await getManageList({ page: page.value, pageSize: pageSize.value, orderKey: 'id', desc: true, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -1349,7 +1351,8 @@ const initForm = () => {
         a3_result: "",
         a3_end: "",
         a3_setting: "",
-        a3_step: 0
+        a3_step: 0,
+        a3_issues: ''
         //处置方法
 
     }
@@ -1426,6 +1429,17 @@ const closeDialog = () => {
 
 const enterDialog = async () => {
     apiForm.value.validate(async valid => {
+        if (setp.value === 4 && Issues.value.length === 0) {
+            ElMessage({
+                type: 'error',
+                message: '请选择问题在提交',
+                showClose: true
+            })
+            return
+        }
+        if (Issues.value !== undefined || Issues.value.length > 0) {
+            form.value.a3_issues = JSON.stringify(Issues.value)
+        }
         form.value.a3_issue_desc = JSON.stringify(tableIssueData.value)
         form.value.a3_cause = JSON.stringify(tableCauseData.value)
         form.value.a3_result = JSON.stringify(tableResultData.value)

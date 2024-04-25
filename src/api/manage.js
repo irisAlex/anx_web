@@ -1,5 +1,5 @@
 import service from "@/utils/request";
-
+import fileDownload from 'js-file-download'
 export const getAuthorityList = (data) => {
   return service({
     url: "/authority/getAuthorityList",
@@ -210,5 +210,17 @@ export const closeAllByID = (data) => {
     url: '/manage/closeAllById',
     method: 'post',
     data: data
+  })
+}
+
+//获取部门用户
+export const downFile = (params) => {
+  return service({
+    url: '/manage/downFile',
+    method: 'get',
+    params,
+    config: {
+      responseType: 'blob',
+    }
   })
 }

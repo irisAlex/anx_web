@@ -2,26 +2,26 @@
     <div>
         <div class="gva-search-box">
             <el-form ref="searchForm" :inline="true" :model="searchInfo">
-                <el-form-item label="部门" style="width:10%">
+                <el-form-item label="部门" style="width:200px;">
                     <el-select v-model="searchInfo.department" placeholder="北京安新">
                         <el-option v-for="item in departmentList" :key="item.authorityId" :label="item.authorityName"
                             :value="item.authorityName">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="类别" style="width:10%">
+                <el-form-item label="类别" style="width:200px;">
                     <el-select v-model="searchInfo.category" placeholder="请选择">
                         <el-option v-for="item in genreList1" :key="item.name" :label="item.genre" :value="item.genre">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="受检物名称" style="width:10%">
+                <el-form-item label="受检物名称" style="width:200px;">
                     <el-input v-model="searchInfo.checkout_name" placeholder="受检物名称" />
                 </el-form-item>
-                <el-form-item label="项目名称" style="width:10%">
+                <el-form-item label="项目名称" style="width:200px;">
                     <el-input v-model="searchInfo.project" placeholder="项目名称" />
                 </el-form-item>
-                <el-form-item label="供应商名称" style="width:10%">
+                <el-form-item label="供应商名称" style="width:200px;">
                     <el-input v-model="searchInfo.supplier" placeholder="项目名称" />
                 </el-form-item>
 
@@ -53,8 +53,8 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column align="left" label="配做方案" min-width="150" prop="parts_desc" sortable="custom"
-                    v-html="parts_desc" />
+                <!-- <el-table-column align="left" label="配做方案" min-width="150" prop="parts_desc" sortable="custom"
+                    v-html="parts_desc" /> -->
                 <el-table-column align="left" label="配做订单" min-width="600" prop="series">
                     <template #default="scope">
                         <el-table :data="JSON.parse(scope.row.series)" border style="width: 100%;" :stripe="true">
@@ -87,8 +87,10 @@
                 </el-table-column>
                 <el-table-column align="left" label="延期时间" min-width="150" prop="deferred_date" sortable="custom">
                     <template #default="scope">
-                        <i class="el-icon-time"></i>
-                        <span style="margin-left: 10px">{{ formatDate(scope.row.deferred_date) }}</span>
+                        <el-tag :type="info" disable-transitions>
+                            {{ scope.row.deferred_date !== '0001-01-01T00:00:00Z' ?
+                                formatDate(scope.row.deferred_date) : '按期完成任务' }}
+                        </el-tag>
                     </template>
                 </el-table-column>
 
@@ -116,7 +118,11 @@
             <el-form ref="apiForm" :model="form" :rules="rules" :inline="true">
                 <div v-if="isLook">
                     <el-form-item label="配做方案" prop="parts_desc" style="width:100%">
-                        <div>
+                        <div v-if="Look">
+                            <QuillEditor :options="editorOptions" content-type="html" ref="quillEditor" theme="snow"
+                                v-model:content="form.parts_desc" :value="form.parts_desc" readOnly />
+                        </div>
+                        <div v-if="!Look">
                             <QuillEditor :options="editorOptions" content-type="html" ref="quillEditor" theme="snow"
                                 v-model:content="form.parts_desc" :value="form.parts_desc" />
                         </div>
@@ -125,32 +131,36 @@
                         <el-table :data="orderList" border style="width: 100%;" :stripe="true">
                             <el-table-column label="产品系列号" align="center" min-width="150" prop="product_serialnumber">
                                 <template #default="scope">
-                                    <el-input v-model="scope.row.product_serialnumber"></el-input>
+                                    <span v-if="Look">{{ scope.row.product_serialnumber }}</span>
+                                    <el-input v-model="scope.row.product_serialnumber" v-if="!Look"></el-input>
                                 </template>
                             </el-table-column>
                             <el-table-column label="产品名称" align="center" min-width="150" prop="product_name">
                                 <template #default="scope">
-                                    <el-input v-model="scope.row.product_name"></el-input>
+                                    <span v-if="Look">{{ scope.row.product_serialnumber }}</span>
+                                    <el-input v-model="scope.row.product_name" v-if="!Look"></el-input>
                                 </template>
                             </el-table-column>
                             <el-table-column label="物料系列号" min-width="150" prop="w_serialnumber">
                                 <template #default="scope">
-                                    <el-input v-model="scope.row.w_serialnumber"></el-input>
+                                    <span v-if="Look">{{ scope.row.product_serialnumber }}</span>
+                                    <el-input v-model="scope.row.w_serialnumber" v-if="!Look"></el-input>
                                 </template>
                             </el-table-column>
                             <el-table-column label="物料名称" align="center" min-width="150" prop="w_name">
                                 <template #default="scope">
-                                    <el-input v-model="scope.row.w_name"></el-input>
+                                    <span v-if="Look">{{ scope.row.product_serialnumber }}</span>
+                                    <el-input v-model="scope.row.w_name" v-if="!Look"></el-input>
                                 </template>
                             </el-table-column>
-                            <el-table-column label="操作" min-width="50" prop="action" align="center">
+                            <el-table-column label="操作" min-width="50" prop="action" align="center" v-if="!Look">
                                 <template #default="scope">
                                     <el-button @click="deleteTableData(scope.row)" link icon="Delete"
                                         type="primary"></el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <el-icon @click="addTableData" class="icon" size="24" color="#fb7a14">
+                        <el-icon @click="addTableData" class="icon" size="24" color="#fb7a14" v-if="!Look">
                             <CirclePlusFilled />
                         </el-icon>
                     </el-form-item>
@@ -372,7 +382,7 @@ const operation = ref("配做")
 // 查询
 const getTableData = async () => {
     // searchInfo.value.status = '1'
-    const table = await getManageList({ page: page.value, pageSize: pageSize.value, keyword: operation.value, ...searchInfo.value })
+    const table = await getManageList({ page: page.value, pageSize: pageSize.value, keyword: operation.value, orderKey: 'id', desc: true, ...searchInfo.value })
     if (table.code === 0) {
         tableData.value = table.data.list
         total.value = table.data.total
@@ -436,22 +446,25 @@ const initForm = () => {
 
 const dialogTitle = ref('查看配做')
 const dialogFormVisible = ref(false)
+const Look = ref(false)
 const openDialog = (key) => {
     switch (key) {
         case 'edit':
             isLook.value = false
             isFormDisabled.value = true
-            dialogTitle.value = '查看配做'
+            dialogTitle.value = '更新延期时间'
             break
         case 'modify':
             isLook.value = true
             isFormDisabled.value = true
+            Look.value = false
             dialogTitle.value = '修改配做'
             break
         case 'look':
             isLook.value = true
             isFormDisabled.value = false
-            dialogTitle.value = '更新配做'
+            Look.value = true
+            dialogTitle.value = '查看配做'
         default:
             break
     }
